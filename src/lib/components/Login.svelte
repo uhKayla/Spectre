@@ -9,7 +9,7 @@
 	let email = '';
 	let password = '';
 	let twoFactorCode = '';
-	let responseMessage = '';
+	let responseMessage: unknown = '';
 	let requiresTwoFactorAuth = false;
 	let useEmailOtp = false;
 
