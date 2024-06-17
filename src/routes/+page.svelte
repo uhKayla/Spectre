@@ -20,7 +20,7 @@
 			<p class="text-2xl font-mono">Friends Online: <b>54</b></p>
 		</div>
 		<div class="p-4">
-			<Button>Dashboard&nbsp;<ArrowUpRight class="w-4 h-4" /></Button>
+			<Button href="/dash">Dashboard&nbsp;<ArrowUpRight class="w-4 h-4" /></Button>
 		</div>
 	</div>
 </div>

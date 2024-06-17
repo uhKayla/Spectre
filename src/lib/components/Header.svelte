@@ -7,7 +7,7 @@
 	import Sun from "lucide-svelte/icons/sun";
 	import Moon from "lucide-svelte/icons/moon";
 
-	import { toggleMode, mode } from "mode-watcher";
+	import { toggleMode } from "mode-watcher";
 
 	import CircleUser from "lucide-svelte/icons/circle-user";
 	import Menu from "lucide-svelte/icons/menu";
