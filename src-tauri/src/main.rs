@@ -1,3 +1,5 @@
+#![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
 use tauri::command;
 use serde::{Deserialize, Serialize};
 use reqwest::cookie::{CookieStore, Jar};
@@ -22,11 +24,19 @@ struct UserResponse {
     username: Option<String>,
     requires_two_factor_auth: Option<Vec<String>>,
     message: Option<String>,
+    response_body: Option<String>,
 }
 
 #[derive(Deserialize)]
 struct GetRequestParams {
     url: String,
+}
+
+#[derive(Deserialize)]
+struct RequestParams {
+    url: String,
+    method: String,
+    body: Option<serde_json::Value>,
 }
 
 #[derive(Default)]
@@ -67,23 +77,24 @@ async fn login(params: LoginParams, state: tauri::State<'_, Mutex<AppState>>) ->
     let response = client
         .get(url.clone())
         .header("Authorization", format!("Basic {}", params.encoded_credentials))
-        .header("User-Agent", "YourAppName/1.0")
+        .header("User-Agent", "Spectre/1.0")
         .send()
         .await;
 
     match response {
         Ok(resp) => {
-            if resp.status().is_success() {
-                let user: serde_json::Value = resp.json().await.unwrap();
+            let status = resp.status();
+            let content = resp.text().await.unwrap();
+            if status.is_success() {
+                let user: serde_json::Value = serde_json::from_str(&content).unwrap();
                 state.lock().unwrap().save_cookies().unwrap(); // Save cookies after successful login
                 Ok(UserResponse {
                     username: user["displayname"].as_str().map(String::from),
                     requires_two_factor_auth: user["requiresTwoFactorAuth"].as_array().map(|arr| arr.iter().map(|v| v.as_str().unwrap().to_string()).collect()),
                     message: None,
+                    response_body: Some(content),
                 })
             } else {
-                let status = resp.status();
-                let content = resp.text().await.unwrap();
                 Err(format!("Login failed with status {}: {}", status, content))
             }
         }
@@ -108,19 +119,19 @@ async fn verify_two_factor(params: TwoFactorParams, state: tauri::State<'_, Mute
 
     let response = client
         .post(url)
-        .header("User-Agent", "YourAppName/1.0")
+        .header("User-Agent", "Spectre/1.0")
         .json(&serde_json::json!({ "code": params.code }))
         .send()
         .await;
 
     match response {
         Ok(resp) => {
-            if resp.status().is_success() {
+            let status = resp.status();
+            let content = resp.text().await.unwrap();
+            if status.is_success() {
                 state.lock().unwrap().save_cookies().unwrap(); // Save cookies after successful 2FA verification
-                Ok("2FA verification successful".to_string())
+                Ok(content)
             } else {
-                let status = resp.status();
-                let content = resp.text().await.unwrap();
                 Err(format!("2FA verification failed with status {}: {}", status, content))
             }
         }
@@ -192,13 +203,55 @@ async fn get_request(state: tauri::State<'_, Mutex<AppState>>) -> Result<String,
     }
 }
 
+#[command]
+async fn make_request(params: RequestParams, state: tauri::State<'_, Mutex<AppState>>) -> Result<String, String> {
+    let cookie_jar = state.lock().unwrap().cookie_jar.clone();
+    let client = reqwest::Client::builder()
+        .cookie_store(true)
+        .cookie_provider(cookie_jar)
+        .build()
+        .unwrap();
+
+    let url = Url::parse(&params.url).map_err(|e| format!("Invalid URL: {}", e))?;
+    let mut request_builder = match params.method.to_uppercase().as_str() {
+        "GET" => client.get(url),
+        "POST" => client.post(url),
+        "PUT" => client.put(url),
+        "DELETE" => client.delete(url),
+        _ => return Err("Invalid HTTP method".to_string()),
+    };
+
+    if let Some(body) = params.body {
+        request_builder = request_builder.json(&body);
+    }
+
+    let response = request_builder
+        .header("User-Agent", "Spectre/1.0")
+        .send()
+        .await;
+
+    match response {
+        Ok(resp) => {
+            if resp.status().is_success() {
+                let json = resp.text().await.map_err(|e| format!("Failed to read response: {}", e))?;
+                Ok(json)
+            } else {
+                let status = resp.status();
+                let content = resp.text().await.unwrap_or_default();
+                Err(format!("Request failed with status {}: {}", status, content))
+            }
+        }
+        Err(err) => Err(format!("Request failed: {}", err)),
+    }
+}
+
 fn main() {
     let state = Mutex::new(AppState::default());
     state.lock().unwrap().load_cookies().unwrap_or_default();
 
     tauri::Builder::default()
         .manage(state)
-        .invoke_handler(tauri::generate_handler![login, verify_two_factor, logout, get_request])
+        .invoke_handler(tauri::generate_handler![login, verify_two_factor, logout, get_request, make_request])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
