@@ -24,6 +24,11 @@ struct UserResponse {
     message: Option<String>,
 }
 
+#[derive(Deserialize)]
+struct GetRequestParams {
+    url: String,
+}
+
 #[derive(Default)]
 struct AppState {
     cookie_jar: Arc<Jar>,
@@ -104,7 +109,7 @@ async fn verify_two_factor(params: TwoFactorParams, state: tauri::State<'_, Mute
     let response = client
         .post(url)
         .header("User-Agent", "YourAppName/1.0")
-        .json(&params)
+        .json(&serde_json::json!({ "code": params.code }))
         .send()
         .await;
 
@@ -128,7 +133,7 @@ async fn logout(state: tauri::State<'_, Mutex<AppState>>) -> Result<String, Stri
     let cookie_jar = state.lock().unwrap().cookie_jar.clone();
     let client = reqwest::Client::builder()
         .cookie_store(true)
-        .cookie_provider(cookie_jar)
+        .cookie_provider(cookie_jar.clone())
         .build()
         .unwrap();
 
@@ -136,14 +141,14 @@ async fn logout(state: tauri::State<'_, Mutex<AppState>>) -> Result<String, Stri
 
     let response = client
         .put(url.clone())
-        .header("User-Agent", "YourAppName/1.0")
+        .header("User-Agent", "Spectre/1.0")
         .send()
         .await;
 
     match response {
         Ok(resp) => {
             if resp.status().is_success() {
-                state.lock().unwrap().save_cookies().unwrap(); // Save cookies after successful logout
+                state.lock().unwrap().save_cookies().unwrap();
                 Ok("Logged out successfully".to_string())
             } else {
                 let status = resp.status();
@@ -155,13 +160,45 @@ async fn logout(state: tauri::State<'_, Mutex<AppState>>) -> Result<String, Stri
     }
 }
 
+#[command]
+async fn get_request(state: tauri::State<'_, Mutex<AppState>>) -> Result<String, String> {
+    let cookie_jar = state.lock().unwrap().cookie_jar.clone();
+    let client = reqwest::Client::builder()
+        .cookie_store(true)
+        .cookie_provider(cookie_jar.clone())
+        .build()
+        .unwrap();
+
+    let url = Url::parse("https://api.vrchat.cloud/api/1/auth/user/friends?offline=true").unwrap();
+
+    let response = client
+        .get(url)
+        .header("User-Agent", "Spectre/1.0")
+        .send()
+        .await;
+
+    match response {
+        Ok(resp) => {
+            if resp.status().is_success() {
+                let body = resp.text().await.map_err(|e| format!("Failed to read response: {}", e))?;
+                Ok(body)
+            } else {
+                let status = resp.status();
+                let content = resp.text().await.unwrap_or_default();
+                Err(format!("Request failed with status {}: {}", status, content))
+            }
+        }
+        Err(err) => Err(format!("Request failed: {}", err)),
+    }
+}
+
 fn main() {
     let state = Mutex::new(AppState::default());
-    state.lock().unwrap().load_cookies().unwrap_or_default(); // Load cookies on startup
+    state.lock().unwrap().load_cookies().unwrap_or_default();
 
     tauri::Builder::default()
         .manage(state)
-        .invoke_handler(tauri::generate_handler![login, verify_two_factor, logout])
+        .invoke_handler(tauri::generate_handler![login, verify_two_factor, logout, get_request])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

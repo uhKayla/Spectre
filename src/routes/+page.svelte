@@ -5,6 +5,13 @@
 
 	import { Button } from "$lib/components/ui/button/index.js";
 	import Footer from '$lib/components/Footer.svelte';
+
+	import { isLoggedIn } from '$lib/stores/auth'
+
+	let loggedIn: boolean;
+	isLoggedIn.subscribe(value => {
+		loggedIn = value;
+	});
 </script>
 
 <style>
@@ -20,7 +27,11 @@
 			<p class="text-2xl font-mono">Friends Online: <b>54</b></p>
 		</div>
 		<div class="p-4">
+			{#if loggedIn}
 			<Button href="/dash">Dashboard&nbsp;<ArrowUpRight class="w-4 h-4" /></Button>
+			{:else}
+			<Button href="/login">Login&nbsp;<ArrowUpRight class="w-4 h-4" /></Button>
+			{/if}
 		</div>
 	</div>
 </div>
