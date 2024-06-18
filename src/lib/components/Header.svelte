@@ -12,6 +12,18 @@
 	import CircleUser from "lucide-svelte/icons/circle-user";
 	import Menu from "lucide-svelte/icons/menu";
 	import { Globe } from 'lucide-svelte';
+	import { invoke } from '@tauri-apps/api';
+	import { goto } from '$app/navigation';
+
+	async function logout() {
+		try {
+			const result = await invoke('logout');
+			console.log(result);
+			await goto('/login');
+		} catch (error) {
+			console.error(error);
+		}
+	}
 </script>
 
 <style>
@@ -88,9 +100,9 @@
 				<DropdownMenu.Label>My Account</DropdownMenu.Label>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item>Settings</DropdownMenu.Item>
-				<DropdownMenu.Item>Support</DropdownMenu.Item>
+				<DropdownMenu.Item href="https://github.com/uhKayla">Github</DropdownMenu.Item>
 				<DropdownMenu.Separator />
-				<DropdownMenu.Item>Logout</DropdownMenu.Item>
+				<DropdownMenu.Item on:click={logout}>Logout</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>

@@ -245,13 +245,22 @@ async fn make_request(params: RequestParams, state: tauri::State<'_, Mutex<AppSt
     }
 }
 
+#[command]
+async fn is_logged_in(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, String> {
+    let url = Url::parse("https://api.vrchat.cloud").unwrap();
+    let cookie_jar = state.lock().unwrap().cookie_jar.clone();
+    let cookies = cookie_jar.cookies(&url).unwrap_or_else(|| "".to_string().parse().unwrap());
+
+    Ok(!cookies.is_empty())
+}
+
 fn main() {
     let state = Mutex::new(AppState::default());
     state.lock().unwrap().load_cookies().unwrap_or_default();
 
     tauri::Builder::default()
         .manage(state)
-        .invoke_handler(tauri::generate_handler![login, verify_two_factor, logout, get_request, make_request])
+        .invoke_handler(tauri::generate_handler![login, verify_two_factor, logout, get_request, make_request, is_logged_in])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
