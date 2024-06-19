@@ -2,6 +2,7 @@
 	import * as Table from "$lib/components/ui/table/index.js";
 	import { friends } from "$lib/stores/friendsStore";
 	import { externalUserData } from "$lib/stores/externalUserStore";
+	import { instanceDataStore } from '$lib/stores/instanceStore';
 	import { onMount } from "svelte";
 	import { loadFriendsAndUserData } from "$lib/utils/loadFriendList";
 	import { Card } from '$lib/components/ui/card';
@@ -9,7 +10,7 @@
 	import * as Tooltip from "$lib/components/ui/tooltip/index.js";
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import { get } from 'svelte/store';
-	import { locations } from '$lib/stores/locationStore';
+	import { Button } from '$lib/components/ui/button';
 
 	const getStatusClass = (state: string, status: string) => {
 		switch (state?.toLowerCase()) {
@@ -37,17 +38,42 @@
 		await loadFriendsAndUserData();
 		console.log('Friends:', $friends);
 		console.log('External User Data:', $externalUserData);
+		console.log('Instance Data:', $instanceDataStore);
 	};
 
 	onMount(initializeData);
 
-	$: sortedFriends = Array.from($friends.values()).map(friend => ({
-		...friend,
-		state: $externalUserData.get(friend.id)?.state || 'offline',
-		status: $externalUserData.get(friend.id)?.state === 'online' ? $externalUserData.get(friend.id)?.status : ($externalUserData.get(friend.id)?.state === 'active' ? 'On Website' : 'Offline')
-	})).sort((a, b) => {
-		const stateOrder = ['online', 'active', 'offline'];
-		return stateOrder.indexOf(a.state) - stateOrder.indexOf(b.state);
+	$: sortedFriends = Array.from($friends.values()).map(friend => {
+		const userData = $externalUserData.get(friend.id);
+		const instanceData = $instanceDataStore.get(friend.id);
+		const state = userData?.state || 'offline';
+		const status = state === 'online' ? userData?.status : (state === 'active' ? 'On Website' : 'Offline');
+		const locationName = state === 'offline' ? 'Offline' : (state === 'active' ? 'On Website' : (instanceData?.world.name || (friend.location === 'private' ? 'Private' : 'Loading...')));
+		const locationCount = instanceData?.userCount;
+		const locationCapacity = instanceData?.capacity;
+
+		return {
+			...friend,
+			state,
+			status,
+			locationName,
+			locationCount,
+			locationCapacity
+		};
+	}).sort((a, b) => {
+		const stateOrder = {
+			'online:join me': 1,
+			'online:active': 2,
+			'online:ask me': 3,
+			'online:busy': 4,
+			'active': 5,
+			'offline': 6
+		};
+
+		const aKey = `${a.state}:${a.status}`.toLowerCase();
+		const bKey = `${b.state}:${b.status}`.toLowerCase();
+
+		return (stateOrder[aKey] || stateOrder[a.state]) - (stateOrder[bKey] || stateOrder[b.state]);
 	});
 </script>
 
@@ -133,10 +159,17 @@
 					</Table.Cell>
 
 					<!--Location-->
-					<Table.Cell>{$locations[friend.location]?.name || "Loading..."}</Table.Cell>
+					<Table.Cell>
+						{friend.locationName}
+						{#if friend.locationName !== "Private" && friend.locationName !== "On Website"}
+							({friend.locationCount} / {friend.locationCapacity} )
+						{/if}
+					</Table.Cell>
 
 					<!--JoinButton-->
-					<Table.Cell class="text-right">{friend.status}</Table.Cell>
+					<Table.Cell class="text-right">
+						<Button>View Details</Button>
+					</Table.Cell>
 				</Table.Row>
 			{/each}
 		</Table.Body>
