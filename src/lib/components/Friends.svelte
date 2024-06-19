@@ -1,54 +1,54 @@
 <script lang="ts">
 	import * as Table from "$lib/components/ui/table/index.js";
-	import type { Friend } from "$lib/types/friend"; // Use type-only import
-	import type { World } from "$lib/types/world"; // Use type-only import
 	import { friends } from "$lib/stores/friendsStore";
-	import { locations } from "$lib/stores/locationStore";
+	import { externalUserData } from "$lib/stores/externalUserStore";
 	import { onMount } from "svelte";
-	import { loadFriends } from "$lib/api/friendsList";
-	import { loadLocation } from "$lib/api/getLocation";
+	import { loadFriendsAndUserData } from "$lib/utils/loadFriendList";
 	import { Card } from '$lib/components/ui/card';
 	import * as HoverCard from "$lib/components/ui/hover-card/index.js";
 	import * as Tooltip from "$lib/components/ui/tooltip/index.js";
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
+	import { get } from 'svelte/store';
+	import { locations } from '$lib/stores/locationStore';
 
-	const getStatusClass = (status: string) => {
-		switch (status.toLowerCase()) {
-			case "join me":
-				return "status-circle status-join-me";
+	const getStatusClass = (state: string, status: string) => {
+		switch (state?.toLowerCase()) {
+			case "online":
+				switch (status?.toLowerCase()) {
+					case "join me":
+						return "status-circle status-join-me";
+					case "active":
+						return "status-circle status-active";
+					case "ask me":
+						return "status-circle status-ask-me";
+					case "busy":
+						return "status-circle status-busy";
+					default:
+						return "";
+				}
 			case "active":
-				return "status-circle status-active";
-			case "ask me":
-				return "status-circle status-ask-me";
-			case "busy":
-				return "status-circle status-busy";
+				return "status-circle status-website";
 			default:
 				return "";
 		}
 	};
 
 	const initializeData = async () => {
-		try {
-			const friendsData: Friend[] = await loadFriends();
-			const locationData: { [locationId: string]: World } = {};
-
-			for (const friend of friendsData) {
-				try {
-					const location = await loadLocation(friend.location);
-					locationData[friend.location] = <World>location;
-				} catch (error) {
-					console.error(`Error fetching location for ${friend.location}`, error);
-				}
-			}
-
-			locations.set(locationData);
-			friends.set(friendsData); // Set the friends data to the store
-		} catch (error) {
-			console.error('Error initializing data:', error);
-		}
+		await loadFriendsAndUserData();
+		console.log('Friends:', $friends);
+		console.log('External User Data:', $externalUserData);
 	};
 
 	onMount(initializeData);
+
+	$: sortedFriends = Array.from($friends.values()).map(friend => ({
+		...friend,
+		state: $externalUserData.get(friend.id)?.state || 'offline',
+		status: $externalUserData.get(friend.id)?.state === 'online' ? $externalUserData.get(friend.id)?.status : ($externalUserData.get(friend.id)?.state === 'active' ? 'On Website' : 'Offline')
+	})).sort((a, b) => {
+		const stateOrder = ['online', 'active', 'offline'];
+		return stateOrder.indexOf(a.state) - stateOrder.indexOf(b.state);
+	});
 </script>
 
 <style>
@@ -60,7 +60,7 @@
     }
 
     .status-join-me {
-        background-color: blue;
+        background-color: deepskyblue;
     }
 
     .status-active {
@@ -72,13 +72,16 @@
     }
 
     .status-busy {
-        background-color: red;
+        background-color: darkred;
+    }
+
+    .status-website {
+        background-color: gray;
     }
 </style>
 
 <Card>
 	<Table.Root>
-		<!--	<Table.Caption>A list of your recent statuss.</Table.Caption>-->
 		<Table.Header>
 			<Table.Row>
 				<Table.Head class="w-[100px]">Status</Table.Head>
@@ -88,13 +91,13 @@
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
-			{#each $friends as friend, i (i)}
+			{#each sortedFriends as friend, i (i)}
 				<Table.Row class="">
 					<!--Status-->
 					<Tooltip.Root>
 						<Tooltip.Trigger>
 							<Table.Cell class="justify-center">
-								<span class={getStatusClass(friend.status)}></span>
+								<span class={getStatusClass(friend.state, friend.status)}></span>
 							</Table.Cell>
 						</Tooltip.Trigger>
 						<Tooltip.Content>
@@ -113,19 +116,15 @@
 									<Avatar.Root>
 										{#if friend.userIcon == null}
 											<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
-											{:else}
+										{:else}
 											<Avatar.Image src={friend.userIcon} />
-											{/if}
+										{/if}
 										<Avatar.Fallback>SK</Avatar.Fallback>
 									</Avatar.Root>
 									<div class="space-y-1">
 										<h4 class="text-sm font-semibold">{friend.displayName}</h4>
 										<p class="text-sm whitespace-pre-line">{friend.bio}</p>
 										<div class="flex items-center pt-2">
-<!--											<CalendarDays class="mr-2 h-4 w-4 opacity-70" />-->
-<!--											<span class="text-xs text-muted-foreground">-->
-<!--												Joined September 2022-->
-<!--											</span>-->
 										</div>
 									</div>
 								</div>

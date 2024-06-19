@@ -4,23 +4,18 @@
 	import { Button } from "$lib/components/ui/button/index.js";
 	import Footer from '$lib/components/Footer.svelte';
 	import { user } from '$lib/stores/user';
-	import { isLoggedIn } from '$lib/stores/auth';
 	import type { UserData } from '$lib/types/user';
+	import { goto } from '$app/navigation';
 
-	let loggedIn: boolean;
 	let onlineFriendsCount = 0;
-
-	// Subscribe to the isLoggedIn store
-	isLoggedIn.subscribe(value => {
-		loggedIn = value;
-	});
 
 	// Subscribe to the user store and get the online friends count
 	user.subscribe((userData: UserData | null) => {
 		if (userData) {
 			onlineFriendsCount = userData.onlineFriends.length;
 		} else {
-			onlineFriendsCount = 0;
+			// If userData is null, redirect to home page
+			goto('/');
 		}
 	});
 </script>
@@ -38,11 +33,7 @@
 			<p class="text-2xl font-mono">Friends Online: <b>{onlineFriendsCount}</b></p>
 		</div>
 		<div class="p-4">
-			{#if loggedIn}
 				<Button href="/dash">Dashboard&nbsp;<ArrowUpRight class="w-4 h-4" /></Button>
-			{:else}
-				<Button href="/login">Login&nbsp;<ArrowUpRight class="w-4 h-4" /></Button>
-			{/if}
 		</div>
 	</div>
 </div>

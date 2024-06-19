@@ -15,6 +15,12 @@
         "all": true,
         "request": true,
         "scope": ["https://api.vrchat.cloud/*", "http://localhost/*", "http://localhost:5005/*"]
+      },
+      "fs": {
+        "all": true
+      },
+      "path": {
+        "all": true
       }
     },
     "bundle": {
