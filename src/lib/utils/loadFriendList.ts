@@ -1,9 +1,11 @@
-import { get } from 'svelte/store';
+import { invoke } from '@tauri-apps/api/tauri';
+
 import { friends } from '$lib/stores/friendsStore';
 import { externalUserData } from '$lib/stores/externalUserStore';
+
 import type { Friend } from '$lib/types/friend';
 import type { ExternalUserData } from '$lib/types/externalUser';
-import { invoke } from '@tauri-apps/api/tauri';
+
 import { rateLimitedLoadUserData } from '$lib/utils/getUser';
 import { loadInstance } from '$lib/utils/getInstance';
 import { instanceDataStore } from '$lib/stores/instanceStore';

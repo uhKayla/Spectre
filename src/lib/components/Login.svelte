@@ -103,8 +103,8 @@
 		{:else}
 			<Button class="w-full" on:click={login}>Sign in</Button>
 		{/if}
-		<Button class="w-full" on:click={logout}>Log out</Button>
-		<Button on:click={handleRequest}>Make Request</Button>
+<!--		<Button class="w-full" on:click={logout}>Log out</Button>-->
+<!--		<Button on:click={handleRequest}>Make Request</Button>-->
 	</Card.Footer>
 	<p>{responseMessage}</p>
 </Card.Root>

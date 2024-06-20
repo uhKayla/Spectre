@@ -6,8 +6,8 @@
     "distDir": "../build"
   },
   "package": {
-    "productName": "svelte-dash",
-    "version": "0.1.0"
+    "productName": "SpectreVRC",
+    "version": "0.1.1-alpha.0"
   },
   "tauri": {
     "allowlist": {
