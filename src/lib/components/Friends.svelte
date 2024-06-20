@@ -161,16 +161,16 @@
 				{#each Array(5) as _, i}
 					<Table.Row class="">
 						<Table.Cell class="justify-center">
-							<Skeleton width="12px" height="48px" borderRadius="50%"/>
+							<Skeleton class="h-6 w-[250px]"/>
 						</Table.Cell>
 						<Table.Cell>
-							<Skeleton width="100%" height="73px"/>
+							<Skeleton class="h-6 w-[250px]"/>
 						</Table.Cell>
 						<Table.Cell>
-							<Skeleton width="100%" height="73px"/>
+							<Skeleton class="h-6 w-[250px]"/>
 						</Table.Cell>
 						<Table.Cell class="text-right">
-							<Skeleton width="100px" height="73px"/>
+							<Skeleton class="h-6 w-[250px]"/>
 						</Table.Cell>
 					</Table.Row>
 				{/each}
@@ -218,15 +218,20 @@
 
 						<!--Location-->
 						<Table.Cell>
-							{friend.locationName}
 							{#if friend.locationName !== "Private" && friend.locationName !== "On Website"}
-								({friend.locationCount} / {friend.locationCapacity} )
+								{friend.locationName} ({friend.locationCount} / {friend.locationCapacity} )
+							{:else}
+								{friend.locationName}
 							{/if}
 						</Table.Cell>
 
 						<!--JoinButton-->
 						<Table.Cell class="text-right">
-							<Button>View Details</Button>
+							{#if friend.locationName !== "Private" && friend.locationName !== "On Website" }
+								<Button>Details</Button>
+							{:else}
+								<Button disabled variant="outline" class="text-muted-foreground">Details</Button>
+							{/if}
 						</Table.Cell>
 					</Table.Row>
 				{/each}
