@@ -64,6 +64,7 @@
 		const locationName = state === 'offline' ? 'Offline' : (state === 'active' ? 'On Website' : (instanceData?.world.name || (friend.location === 'private' ? 'Private' : 'Loading...')));
 		const locationCount = instanceData?.userCount;
 		const locationCapacity = instanceData?.capacity;
+		const locationData = instanceData?.world;
 
 		return {
 			...friend,
@@ -71,7 +72,8 @@
 			status,
 			locationName,
 			locationCount,
-			locationCapacity
+			locationCapacity,
+			locationData
 		};
 	}).sort((a, b) => {
 		const stateOrder = {
@@ -219,7 +221,24 @@
 						<!--Location-->
 						<Table.Cell>
 							{#if friend.locationName !== "Private" && friend.locationName !== "On Website"}
-								{friend.locationName} ({friend.locationCount} / {friend.locationCapacity} )
+								<HoverCard.Root>
+									<HoverCard.Trigger>
+										{friend.locationName} ({friend.locationCount} / {friend.locationData.recommendedCapacity}) [{friend.locationCapacity}]
+									</HoverCard.Trigger>
+									<HoverCard.Content class="w-80">
+										<div class="flex justify-between space-x-4">
+											<Avatar.Root>
+													<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
+												<Avatar.Fallback>SK</Avatar.Fallback>
+											</Avatar.Root>
+											<div class="space-y-1">
+												<h4 class="text-sm font-semibold">{friend.locationName}</h4>
+												<p class="text-xs whitespace-pre-line">{friend.locationData.description}</p>
+												<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.locationCount} / {friend.locationData.recommendedCapacity} ({friend.locationCapacity})</div>
+											</div>
+										</div>
+									</HoverCard.Content>
+								</HoverCard.Root>
 							{:else}
 								{friend.locationName}
 							{/if}

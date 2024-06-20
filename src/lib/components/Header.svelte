@@ -122,7 +122,7 @@
 					{/if}
 				</DropdownMenu.Label>
 				<DropdownMenu.Separator />
-				<DropdownMenu.Item>Settings</DropdownMenu.Item>
+				<DropdownMenu.Item href="/user/test">Settings</DropdownMenu.Item>
 				<DropdownMenu.Item on:click={openGithub}>Github</DropdownMenu.Item>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item on:click={logout}>Logout</DropdownMenu.Item>
