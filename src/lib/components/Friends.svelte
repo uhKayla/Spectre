@@ -11,6 +11,10 @@
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import { get } from 'svelte/store';
 	import { Button } from '$lib/components/ui/button';
+	import { LucideRefreshCw } from 'lucide-svelte';
+	import { Skeleton } from '$lib/components/ui/skeleton';
+
+	let loading = !get(friends).size || !get(externalUserData).size || !get(instanceDataStore).size;
 
 	const getStatusClass = (state: string, status: string) => {
 		switch (state?.toLowerCase()) {
@@ -34,14 +38,23 @@
 		}
 	};
 
-	const initializeData = async () => {
-		await loadFriendsAndUserData();
-		console.log('Friends:', $friends);
-		console.log('External User Data:', $externalUserData);
-		console.log('Instance Data:', $instanceDataStore);
+	const initializeData = async (forceReload = false) => {
+		const friendsStore = get(friends);
+		const externalUserDataStore = get(externalUserData);
+		const instanceStore = get(instanceDataStore);
+
+		if (forceReload || friendsStore.size === 0 || externalUserDataStore.size === 0 || instanceStore.size === 0) {
+			loading = true;
+			await loadFriendsAndUserData();
+			loading = false;
+		}
 	};
 
-	onMount(initializeData);
+	const handleRefresh = () => {
+		initializeData(true);
+	};
+
+	onMount(() => initializeData());
 
 	$: sortedFriends = Array.from($friends.values()).map(friend => {
 		const userData = $externalUserData.get(friend.id);
@@ -104,7 +117,34 @@
     .status-website {
         background-color: gray;
     }
+
+    @keyframes rotate {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .rotating {
+        animation: rotate 1s linear infinite;
+    }
 </style>
+
+<div class="grid grid-cols-2">
+	<div class="text-3xl">Friends</div>
+	<div class="justify-end content-end items-end text-end">
+		<Button variant="outline" on:click={handleRefresh} size="icon">
+			{#if loading}
+				<LucideRefreshCw class="h-[1.2rem] w-[1.2rem] transition-all rotating" />
+			{:else}
+				<LucideRefreshCw class="h-[1.2rem] w-[1.2rem] transition-all rotating" />
+			{/if}
+		</Button>
+	</div>
+</div>
+<br>
 
 <Card>
 	<Table.Root>
@@ -117,61 +157,80 @@
 			</Table.Row>
 		</Table.Header>
 		<Table.Body>
-			{#each sortedFriends as friend, i (i)}
-				<Table.Row class="">
-					<!--Status-->
-					<Tooltip.Root>
-						<Tooltip.Trigger>
-							<Table.Cell class="justify-center">
-								<span class={getStatusClass(friend.state, friend.status)}></span>
-							</Table.Cell>
-						</Tooltip.Trigger>
-						<Tooltip.Content>
-							<p>{friend.status}</p>
-						</Tooltip.Content>
-					</Tooltip.Root>
+			{#if loading}
+				{#each Array(5) as _, i}
+					<Table.Row class="">
+						<Table.Cell class="justify-center">
+							<Skeleton width="12px" height="48px" borderRadius="50%"/>
+						</Table.Cell>
+						<Table.Cell>
+							<Skeleton width="100%" height="73px"/>
+						</Table.Cell>
+						<Table.Cell>
+							<Skeleton width="100%" height="73px"/>
+						</Table.Cell>
+						<Table.Cell class="text-right">
+							<Skeleton width="100px" height="73px"/>
+						</Table.Cell>
+					</Table.Row>
+				{/each}
+			{:else}
+				{#each sortedFriends as friend, i (i)}
+					<Table.Row class="">
+						<!--Status-->
+						<Tooltip.Root>
+							<Tooltip.Trigger>
+								<Table.Cell class="justify-center">
+									<span class={getStatusClass(friend.state, friend.status)}></span>
+								</Table.Cell>
+							</Tooltip.Trigger>
+							<Tooltip.Content>
+								<p>{friend.status}</p>
+							</Tooltip.Content>
+						</Tooltip.Root>
 
-					<!--Name-->
-					<Table.Cell>
-						<HoverCard.Root>
-							<HoverCard.Trigger>
-								{friend.displayName}
-							</HoverCard.Trigger>
-							<HoverCard.Content class="w-80">
-								<div class="flex justify-between space-x-4">
-									<Avatar.Root>
-										{#if friend.userIcon == null}
-											<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
-										{:else}
-											<Avatar.Image src={friend.userIcon} />
-										{/if}
-										<Avatar.Fallback>SK</Avatar.Fallback>
-									</Avatar.Root>
-									<div class="space-y-1">
-										<h4 class="text-sm font-semibold">{friend.displayName}</h4>
-										<p class="text-sm whitespace-pre-line">{friend.bio}</p>
-										<div class="flex items-center pt-2">
+						<!--Name-->
+						<Table.Cell>
+							<HoverCard.Root>
+								<HoverCard.Trigger>
+									{friend.displayName}
+								</HoverCard.Trigger>
+								<HoverCard.Content class="w-80">
+									<div class="flex justify-between space-x-4">
+										<Avatar.Root>
+											{#if friend.userIcon == null}
+												<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
+											{:else}
+												<Avatar.Image src={friend.userIcon} />
+											{/if}
+											<Avatar.Fallback>SK</Avatar.Fallback>
+										</Avatar.Root>
+										<div class="space-y-1">
+											<h4 class="text-sm font-semibold">{friend.displayName}</h4>
+											<p class="text-sm whitespace-pre-line">{friend.bio}</p>
+											<div class="flex items-center pt-2">
+											</div>
 										</div>
 									</div>
-								</div>
-							</HoverCard.Content>
-						</HoverCard.Root>
-					</Table.Cell>
+								</HoverCard.Content>
+							</HoverCard.Root>
+						</Table.Cell>
 
-					<!--Location-->
-					<Table.Cell>
-						{friend.locationName}
-						{#if friend.locationName !== "Private" && friend.locationName !== "On Website"}
-							({friend.locationCount} / {friend.locationCapacity} )
-						{/if}
-					</Table.Cell>
+						<!--Location-->
+						<Table.Cell>
+							{friend.locationName}
+							{#if friend.locationName !== "Private" && friend.locationName !== "On Website"}
+								({friend.locationCount} / {friend.locationCapacity} )
+							{/if}
+						</Table.Cell>
 
-					<!--JoinButton-->
-					<Table.Cell class="text-right">
-						<Button>View Details</Button>
-					</Table.Cell>
-				</Table.Row>
-			{/each}
+						<!--JoinButton-->
+						<Table.Cell class="text-right">
+							<Button>View Details</Button>
+						</Table.Cell>
+					</Table.Row>
+				{/each}
+			{/if}
 		</Table.Body>
 	</Table.Root>
 </Card>

@@ -5,7 +5,7 @@
 	import { Input } from "$lib/components/ui/input/index.js";
 	import { Label } from "$lib/components/ui/label/index.js";
 	import { encode as base64_encode } from 'js-base64';
-	import { makeRequest } from '$lib/rust/makeRequest';
+	import { goto } from '$app/navigation';
 
 	let email = '';
 	let password = '';
@@ -25,11 +25,14 @@
 			if (result.requires_two_factor_auth) {
 				requiresTwoFactorAuth = true;
 				useEmailOtp = result.requires_two_factor_auth.includes('emailOtp');
-			} else {
+			}
+			else {
 				responseMessage = result.message || `User: ${result.username}`;
+				goto("/home")
 			}
 			console.log(result);
-		} catch (error) {
+		}
+		catch (error) {
 			responseMessage = error;
 			console.error(error);
 		}
@@ -47,29 +50,9 @@
 			requiresTwoFactorAuth = false;
 			useEmailOtp = false;
 			console.log(result);
-		} catch (error) {
-			responseMessage = error;
-			console.error(error);
+			goto("/home")
 		}
-	}
-
-	async function logout() {
-		try {
-			const result = await invoke('logout');
-			responseMessage = result;
-			console.log(result);
-		} catch (error) {
-			responseMessage = error;
-			console.error(error);
-		}
-	}
-
-	async function handleRequest() {
-		try {
-			const result = await invoke('get_request');
-			responseMessage = result;
-			console.log(result);
-		} catch (error) {
+		catch (error) {
 			responseMessage = error;
 			console.error(error);
 		}
@@ -103,8 +86,6 @@
 		{:else}
 			<Button class="w-full" on:click={login}>Sign in</Button>
 		{/if}
-<!--		<Button class="w-full" on:click={logout}>Log out</Button>-->
-<!--		<Button on:click={handleRequest}>Make Request</Button>-->
 	</Card.Footer>
 	<p>{responseMessage}</p>
 </Card.Root>

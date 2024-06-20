@@ -1,19 +1,19 @@
 <!-- src/lib/components/Header.svelte -->
 <script lang="ts">
+	import { toggleMode } from "mode-watcher";
+	import { open } from '@tauri-apps/api/shell';
+	import { invoke } from '@tauri-apps/api';
+	import { goto } from '$app/navigation';
+
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import * as Sheet from "$lib/components/ui/sheet/index.js";
 	import { Button } from "$lib/components/ui/button/index.js";
 
 	import Sun from "lucide-svelte/icons/sun";
 	import Moon from "lucide-svelte/icons/moon";
-
-	import { toggleMode } from "mode-watcher";
-
 	import CircleUser from "lucide-svelte/icons/circle-user";
 	import Menu from "lucide-svelte/icons/menu";
-	import { Globe } from 'lucide-svelte';
-	import { invoke } from '@tauri-apps/api';
-	import { goto } from '$app/navigation';
+	import Globe from 'lucide-svelte/icons/globe';
 
 	async function logout() {
 		try {
@@ -23,6 +23,10 @@
 		} catch (error) {
 			console.error(error);
 		}
+	}
+
+	const openGithub = () => {
+		open('https://github.com/uhKayla/spectre');
 	}
 </script>
 
@@ -100,7 +104,7 @@
 				<DropdownMenu.Label>My Account</DropdownMenu.Label>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item>Settings</DropdownMenu.Item>
-				<DropdownMenu.Item href="https://github.com/uhKayla">Github</DropdownMenu.Item>
+				<DropdownMenu.Item on:click={openGithub}>Github</DropdownMenu.Item>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item on:click={logout}>Logout</DropdownMenu.Item>
 			</DropdownMenu.Content>

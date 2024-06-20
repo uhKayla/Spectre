@@ -40,7 +40,7 @@ export const loadFriendsAndUserData = async () => {
 				const userData = await rateLimitedLoadUserData(friend.id);
 				userDataMap.set(friend.id, userData);
 
-				if (userData.location && userData.location !== 'private' && userData.location !== 'Private') {
+				if (userData.location && userData.location !== 'private' && userData.location !== 'Private' && userData.location !== 'offline') {
 					const instanceData = await loadInstance(userData.location);
 					instanceDataMap.set(friend.id, instanceData);
 				}
