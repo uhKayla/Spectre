@@ -254,18 +254,31 @@ async fn is_logged_in(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, 
     Ok(!cookies.is_empty())
 }
 
+// get cookies for webhook, thank u robot for telling me how to manipulate the strings
 #[command]
-async fn get_cookies(state: tauri::State<'_, Mutex<AppState>>) -> Result<String, String> {
+async fn get_cookies(state: State<'_, Mutex<AppState>>) -> Result<String, String> {
     let state_lock = state.lock().unwrap();
     let mut file = File::open("cookies.json").map_err(|e| format!("Failed to open cookies file: {}", e))?;
     let mut contents = String::new();
     file.read_to_string(&mut contents).map_err(|e| format!("Failed to read cookies file: {}", e))?;
 
-    // Strip "auth=" from the cookie string
-    if let Some(stripped) = contents.strip_prefix("auth=") {
-        Ok(stripped.to_string())
+    // Function to strip the prefix and cut at the semicolon
+    fn strip_and_cut_prefix(contents: &str, prefix: &str) -> Option<String> {
+        if let Some(stripped) = contents.strip_prefix(prefix) {
+            Some(stripped.split(';').next().unwrap_or("").to_string())
+        } else {
+            None
+        }
+    }
+
+    // Try to strip "twoFactorAuth=" or "auth=" from the cookie string
+    if let Some(stripped) = strip_and_cut_prefix(&contents, "twoFactorAuth=") {
+        Ok(stripped)
+    } else if let Some(stripped) = strip_and_cut_prefix(&contents, "auth=") {
+        Ok(stripped)
     } else {
-        Ok(contents) // If no prefix found, return the original contents
+        // If no prefix found, cut at the first semicolon if it exists
+        Ok(contents.split(';').next().unwrap_or("").to_string())
     }
 }
 
