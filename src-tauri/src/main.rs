@@ -8,10 +8,6 @@ use url::Url;
 use std::fs::File;
 use std::io::{self, Read, Write};
 
-// use futures_util::{SinkExt, StreamExt};
-// use tokio::sync::mpsc;
-// use tokio_tungstenite::connect_async;
-
 #[derive(Deserialize)]
 struct LoginParams {
     encoded_credentials: String,
@@ -46,7 +42,6 @@ struct RequestParams {
 #[derive(Default)]
 struct AppState {
     cookie_jar: Arc<Jar>,
-    // websocket_sender: Option<mpsc::UnboundedSender<String>>,
 }
 
 impl AppState {
@@ -258,59 +253,6 @@ async fn is_logged_in(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, 
 
     Ok(!cookies.is_empty())
 }
-
-/*
-async fn websocket_handler(state: Arc<Mutex<AppState>>, websocket_sender: mpsc::UnboundedSender<String>) -> Result<(), String> {
-    let cookie_jar = state.lock().unwrap().cookie_jar.clone();
-    let url = Url::parse("https://api.vrchat.cloud").unwrap();
-    let cookies = cookie_jar.cookies(&url).unwrap_or_else(|| "".to_string().parse().unwrap());
-
-    let cookie_str = cookies.to_str().map_err(|e| format!("Failed to convert cookies to string: {}", e))?;
-    let websocket_url = format!("wss://pipeline.vrchat.cloud/?authToken={}", cookie_str);
-    let (ws_stream, _) = connect_async(websocket_url).await.map_err(|e| format!("WebSocket connection failed: {}", e))?;
-    let (_, mut read) = ws_stream.split();
-
-    while let Some(message) = read.next().await {
-        match message {
-            Ok(msg) => {
-                if let Ok(text) = msg.to_text() {
-                    websocket_sender.send(text.to_string()).map_err(|e| format!("Failed to send WebSocket message to channel: {}", e))?;
-                }
-            }
-            Err(e) => {
-                return Err(format!("WebSocket error: {}", e));
-            }
-        }
-    }
-
-    Ok(())
-}
-
-#[command]
-async fn start_websocket(state: tauri::State<'_, Arc<Mutex<AppState>>>) -> Result<(), String> {
-    let (tx, mut rx) = mpsc::unbounded_channel();
-    {
-        let mut state_lock = state.lock().unwrap();
-        state_lock.websocket_sender = Some(tx.clone());
-    }
-
-    let state_clone = Arc::clone(&state.inner());
-    tauri::async_runtime::spawn(async move {
-        if let Err(e) = websocket_handler(state_clone, tx).await {
-            eprintln!("WebSocket handler error: {}", e);
-        }
-    });
-
-    while let Some(message) = rx.recv().await {
-        println!("WebSocket message received: {}", message);
-        // Here you can pass the message to the frontend using Tauri's emit
-        // tauri::AppHandle::emit_all("websocket-message", message).unwrap();
-    }
-
-    Ok(())
-}
-*/
-
 
 #[command]
 async fn get_cookies(state: tauri::State<'_, Mutex<AppState>>) -> Result<String, String> {

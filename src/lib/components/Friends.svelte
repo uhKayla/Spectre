@@ -207,8 +207,8 @@
 										</Avatar.Root>
 										<div class="space-y-1">
 											<h4 class="text-sm font-semibold">{friend.displayName}</h4>
-											<p class="text-sm whitespace-pre-line">{friend.bio}</p>
-											<div class="flex items-center pt-2">
+											<p class="text-sm whitespace-pre-line">{friend.statusDescription}</p>
+											<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.bio}
 											</div>
 										</div>
 									</div>

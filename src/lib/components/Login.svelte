@@ -27,7 +27,7 @@
 				useEmailOtp = result.requires_two_factor_auth.includes('emailOtp');
 			}
 			else {
-				responseMessage = result.message || `User: ${result.username}`;
+				responseMessage = result.message || `User: ${result.displayname}`;
 				goto("/home")
 			}
 			console.log(result);

@@ -4,6 +4,7 @@
 	import { open } from '@tauri-apps/api/shell';
 	import { invoke } from '@tauri-apps/api';
 	import { goto } from '$app/navigation';
+	import { user } from '$lib/stores/user';
 
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 	import * as Sheet from "$lib/components/ui/sheet/index.js";
@@ -14,6 +15,18 @@
 	import CircleUser from "lucide-svelte/icons/circle-user";
 	import Menu from "lucide-svelte/icons/menu";
 	import Globe from 'lucide-svelte/icons/globe';
+	import type { UserData } from '$lib/types/user';
+
+	let currentUser : UserData | null
+
+	user.subscribe((userData: UserData | null) => {
+		if (userData) {
+			currentUser = userData;
+		} else {
+			// If userData is null, redirect to home page
+			goto('/');
+		}
+	});
 
 	async function logout() {
 		try {
@@ -101,7 +114,13 @@
 				</Button>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content align="end">
-				<DropdownMenu.Label>My Account</DropdownMenu.Label>
+				<DropdownMenu.Label>
+					{#if currentUser !== null && currentUser.displayName !== null}
+						{currentUser.displayName}
+					{:else}
+						Not Logged In
+					{/if}
+				</DropdownMenu.Label>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item>Settings</DropdownMenu.Item>
 				<DropdownMenu.Item on:click={openGithub}>Github</DropdownMenu.Item>
