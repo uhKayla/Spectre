@@ -34,7 +34,6 @@
 		</div>
 		<div class="p-4">
 				<Button href="/dash">Dashboard&nbsp;<ArrowUpRight class="w-4 h-4" /></Button>
-				<Button href="/user/anything">Dashboard2&nbsp;<ArrowUpRight class="w-4 h-4" /></Button>
 		</div>
 	</div>
 </div>
