@@ -10,6 +10,7 @@
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu/index.js';
 	import * as Sheet from '$lib/components/ui/sheet/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import * as Avatar from '$lib/components/ui/avatar/index.js'
 
 	import Sun from 'lucide-svelte/icons/sun';
 	import Moon from 'lucide-svelte/icons/moon';
@@ -54,7 +55,7 @@
 	<nav class="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
 		<a href="/" class="flex items-center gap-2 text-lg font-semibold md:text-base">
 			<Globe class="h-6 w-6" />
-			<span class="sr-only">Acme Inc</span>
+			<span class="sr-only">Spectre VRC</span>
 		</a>
 		<a href="/dash" class:text-foreground={$page.url.pathname === '/dash'} class:text-muted-foreground={$page.url.pathname !== '/dash'} class="hover:text-foreground">
 			Dashboard
@@ -95,18 +96,21 @@
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild let:builder>
 				<Button builders={[builder]} variant="secondary" size="icon" class="rounded-full">
-					<CircleUser class="h-5 w-5" />
+					<Avatar.Root class="hidden h-9 w-9 sm:flex">
+						<Avatar.Image src={currentUser?.userIcon || currentUser?.currentAvatarImageUrl} alt="Avatar" />
+						<Avatar.Fallback><CircleUser class="h-5 w-5" /></Avatar.Fallback>
+					</Avatar.Root>
 					<span class="sr-only">Toggle user menu</span>
 				</Button>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content align="end">
-				<DropdownMenu.Label>
+				<DropdownMenu.Item href="/me">
 					{#if currentUser !== null && currentUser.displayName !== null}
 						{currentUser.displayName}
 					{:else}
 						Not Logged In
 					{/if}
-				</DropdownMenu.Label>
+				</DropdownMenu.Item>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item href="/user/test">Settings</DropdownMenu.Item>
 				<DropdownMenu.Item on:click={openGithub}>Github</DropdownMenu.Item>

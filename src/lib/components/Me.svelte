@@ -1,8 +1,9 @@
 <script lang="ts">
-	import { externalUserData } from '$lib/stores/externalUserStore';
+	import { user } from "$lib/stores/user"
+	import type { UserData } from "$lib/types/user"
+
 	import { get } from 'svelte/store';
 	import { onMount } from 'svelte';
-	import type { ExternalUserData } from '$lib/types/externalUser';
 	import { open } from '@tauri-apps/api/shell';
 
 	import { Button } from '$lib/components/ui/button';
@@ -11,6 +12,7 @@
 	import * as Card from "$lib/components/ui/card";
 	import * as Avatar from "$lib/components/ui/avatar";
 	import { Badge } from "$lib/components/ui/badge/index.js";
+	import * as Tabs from "$lib/components/ui/tabs";
 
 	import Link from "lucide-svelte/icons/link";
 	import Twitter from "lucide-svelte/icons/twitter";
@@ -19,9 +21,24 @@
 	import Github from "lucide-svelte/icons/github";
 	import Facebook from "lucide-svelte/icons/facebook";
 	import Instagram from "lucide-svelte/icons/instagram";
+	import Bio from '$lib/components/userComponent/Bio.svelte';
+	import Json from '$lib/components/userComponent/Json.svelte';
+	import OwnAvatar from '$lib/components/userComponent/OwnAvatar.svelte';
 
-	export let userId: string;
-	let user: ExternalUserData | undefined;
+	let currentUser: UserData | null;
+
+	currentUser = get(user)
+
+	const unsubscribe = user.subscribe((userData) => {
+		currentUser = userData;
+	});
+
+	onMount(() => {
+		// Clean up the subscription when the component is unmounted
+		return () => {
+			unsubscribe();
+		};
+	});
 
 	const tagToBadgeMap: { [key: string]: string } = {
 		"system_supporter": "VRC+",
@@ -91,28 +108,27 @@
 		open(link)
 	}
 
-	onMount(() => {
-		const userMap = get(externalUserData);
-		user = userMap.get(userId);
-	});
+	function formatUserData(userData: UserData | null): string {
+		return JSON.stringify(userData, null, 2);
+	}
 </script>
 
 <div class="grid gap-8">
 	<div class="flex items-center gap-4">
 		<Avatar.Root class="hidden h-9 w-9 sm:flex">
-			<Avatar.Image src={user?.userIcon || user?.currentAvatarImageUrl} alt="Avatar" />
-			<Avatar.Fallback>{user?.displayName?.charAt(0).toUpperCase() || 'NA'}</Avatar.Fallback>
+			<Avatar.Image src={currentUser?.userIcon || currentUser?.currentAvatarImageUrl} alt="Avatar" />
+			<Avatar.Fallback>{currentUser?.displayName?.charAt(0).toUpperCase() || 'NA'}</Avatar.Fallback>
 		</Avatar.Root>
 		<div class="grid gap-1">
 			<p class="text-sm font-medium leading-none">
-				{user?.displayName || 'Username'}
+				{currentUser?.displayName || 'Username'}
 			</p>
-			<p class="text-sm text-muted-foreground">{user?.statusDescription || user?.status}</p>
+			<p class="text-sm text-muted-foreground">{currentUser?.statusDescription || currentUser?.status}</p>
 		</div>
-		<Button class="ml-auto font-medium">View Instance</Button>
+		<Button class="ml-auto font-medium">View Website</Button>
 	</div>
 	<p>
-		{#each getFilteredTags(user?.tags) as tag}
+		{#each getFilteredTags(currentUser?.tags) as tag}
 			{#if tagToBadgeMap[tag]}
 				<Badge variant="outline" style="border-color: {tagToColorMap[tag]}; color: white;">
 					{tagToBadgeMap[tag]}
@@ -120,19 +136,26 @@
 			{/if}
 		{/each}
 	</p>
-	<Separator class="" />
-	<div class="flex flex-col space-y-2">
-		<h1>Bio:</h1>
-		<ScrollArea class="h-40 rounded-md border p-4" orientation="both">
-			<p class="text-sm" style="white-space: pre-line">{user?.bio}</p>
-		</ScrollArea>
-	</div>
-	<div class="flex flex-col space-y-2">
-		<h1>Links:</h1>
-		<div class="flex gap-4">
-			{#each user?.bioLinks ?? [] as link}
-				<Button variant="ghost" size="icon" on:click={openUrl(link)}><svelte:component this={getIconForLink(link)} /></Button>
-			{/each}
-		</div>
-	</div>
+	<Separator />
+	<Tabs.Root value="bio" class="w-[400px]">
+		<Tabs.List class="grid w-full grid-cols-4">
+			<Tabs.Trigger value="bio">Bio</Tabs.Trigger>
+			<Tabs.Trigger value="avatar">Avatars</Tabs.Trigger>
+			<Tabs.Trigger value="worlds">Worlds</Tabs.Trigger>
+			<Tabs.Trigger value="json">JSON</Tabs.Trigger>
+		</Tabs.List>
+		<Tabs.Content value="bio">
+			<Bio currentUser="{currentUser}"/>
+		</Tabs.Content>
+		<Tabs.Content value="avatar">
+			{#if currentUser !== null}
+				<OwnAvatar userId="{currentUser.id}"/>
+			{:else}
+				Avatar couldn't be loaded!
+			{/if}
+		</Tabs.Content>
+		<Tabs.Content value="json">
+			<Json currentUser="{currentUser}"/>
+		</Tabs.Content>
+	</Tabs.Root>
 </div>
