@@ -7,12 +7,14 @@
 	import { loadFriendsAndUserData } from "$lib/utils/loadFriendList";
 	import { Card } from '$lib/components/ui/card';
 	import * as HoverCard from "$lib/components/ui/hover-card/index.js";
+	import * as Dialog from "$lib/components/ui/dialog/index.js"
 	import * as Tooltip from "$lib/components/ui/tooltip/index.js";
 	import * as Avatar from "$lib/components/ui/avatar/index.js";
 	import { get } from 'svelte/store';
 	import { Button } from '$lib/components/ui/button';
-	import { LucideRefreshCw } from 'lucide-svelte';
+	import { LucideRefreshCw, User } from 'lucide-svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
+	import UserInfo from '$lib/components/UserInfo.svelte'
 
 	let loading = !get(friends).size || !get(externalUserData).size || !get(instanceDataStore).size;
 
@@ -193,52 +195,79 @@
 
 						<!--Name-->
 						<Table.Cell>
-							<HoverCard.Root>
-								<HoverCard.Trigger>
-									{friend.displayName}
-								</HoverCard.Trigger>
-								<HoverCard.Content class="w-80">
-									<div class="flex justify-between space-x-4">
-										<Avatar.Root>
-											{#if friend.userIcon == null}
-												<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
-											{:else}
-												<Avatar.Image src={friend.userIcon} />
-											{/if}
-											<Avatar.Fallback>SK</Avatar.Fallback>
-										</Avatar.Root>
-										<div class="space-y-1">
-											<h4 class="text-sm font-semibold">{friend.displayName}</h4>
-											<p class="text-sm whitespace-pre-line">{friend.statusDescription}</p>
-											<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.bio}
+							<Dialog.Root>
+								<Dialog.Trigger>
+									<HoverCard.Root>
+										<HoverCard.Trigger>
+											{friend.displayName}
+										</HoverCard.Trigger>
+										<HoverCard.Content class="w-80">
+											<div class="flex justify-between space-x-4">
+												<Avatar.Root>
+													{#if friend.userIcon === null || friend.userIcon === ""}
+														<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
+													{:else}
+														<Avatar.Image src={friend.userIcon} />
+													{/if}
+													<Avatar.Fallback>SK</Avatar.Fallback>
+												</Avatar.Root>
+												<div class="space-y-1">
+													<h4 class="text-sm font-semibold">{friend.displayName}</h4>
+													<p class="text-sm whitespace-pre-line">{friend.statusDescription}</p>
+													<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.bio}
+													</div>
+												</div>
 											</div>
-										</div>
-									</div>
-								</HoverCard.Content>
-							</HoverCard.Root>
+										</HoverCard.Content>
+									</HoverCard.Root>
+							</Dialog.Trigger>
+							<Dialog.Content>
+<!--								<Dialog.Header>-->
+<!--									<Dialog.Title>Are you sure absolutely sure?</Dialog.Title>-->
+<!--									<Dialog.Description>-->
+<!--										This action cannot be undone. This will permanently delete your account-->
+<!--										and remove your data from our servers.-->
+<!--									</Dialog.Description>-->
+<!--								</Dialog.Header>-->
+								<UserInfo userId={friend.id} />
+							</Dialog.Content>
+							</Dialog.Root>
 						</Table.Cell>
 
 						<!--Location-->
 						<Table.Cell>
 							{#if friend.locationName !== "Private" && friend.locationName !== "On Website"}
-								<HoverCard.Root>
-									<HoverCard.Trigger>
-										{friend.locationName} ({friend.locationCount} / {friend.locationData.recommendedCapacity}) [{friend.locationCapacity}]
-									</HoverCard.Trigger>
-									<HoverCard.Content class="w-80">
-										<div class="flex justify-between space-x-4">
-											<Avatar.Root>
-													<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
-												<Avatar.Fallback>SK</Avatar.Fallback>
-											</Avatar.Root>
-											<div class="space-y-1">
-												<h4 class="text-sm font-semibold">{friend.locationName}</h4>
-												<p class="text-xs whitespace-pre-line">{friend.locationData.description}</p>
-												<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.locationCount} / {friend.locationData.recommendedCapacity} ({friend.locationCapacity})</div>
-											</div>
-										</div>
-									</HoverCard.Content>
-								</HoverCard.Root>
+								<Dialog.Root>
+									<Dialog.Trigger>
+										<HoverCard.Root>
+											<HoverCard.Trigger>
+												{friend.locationName} ({friend.locationCount} / {friend.locationData.recommendedCapacity}) [{friend.locationCapacity}]
+											</HoverCard.Trigger>
+											<HoverCard.Content class="w-80">
+												<div class="flex justify-between space-x-4">
+													<Avatar.Root>
+															<Avatar.Image src={friend.locationData.thumbnailImageUrl} />
+														<Avatar.Fallback>SK</Avatar.Fallback>
+													</Avatar.Root>
+													<div class="space-y-1">
+														<h4 class="text-sm font-semibold">{friend.locationName}</h4>
+														<p class="text-xs whitespace-pre-line">{friend.locationData.description}</p>
+														<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.locationCount} / {friend.locationData.recommendedCapacity} ({friend.locationCapacity})</div>
+													</div>
+												</div>
+											</HoverCard.Content>
+										</HoverCard.Root>
+									</Dialog.Trigger>
+									<Dialog.Content>
+										<Dialog.Header>
+											<Dialog.Title>Are you sure absolutely sure?</Dialog.Title>
+											<Dialog.Description>
+												This action cannot be undone. This will permanently delete your account
+												and remove your data from our servers.
+											</Dialog.Description>
+										</Dialog.Header>
+									</Dialog.Content>
+								</Dialog.Root>
 							{:else}
 								{friend.locationName}
 							{/if}
