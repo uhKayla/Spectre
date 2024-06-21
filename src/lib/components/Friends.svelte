@@ -204,7 +204,7 @@
 										<HoverCard.Content class="w-80">
 											<div class="flex justify-between space-x-4">
 												<Avatar.Root>
-													{#if friend.userIcon == null}
+													{#if friend.userIcon === null || friend.userIcon === ""}
 														<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
 													{:else}
 														<Avatar.Image src={friend.userIcon} />
@@ -246,7 +246,7 @@
 											<HoverCard.Content class="w-80">
 												<div class="flex justify-between space-x-4">
 													<Avatar.Root>
-															<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
+															<Avatar.Image src={friend.locationData.thumbnailImageUrl} />
 														<Avatar.Fallback>SK</Avatar.Fallback>
 													</Avatar.Root>
 													<div class="space-y-1">
