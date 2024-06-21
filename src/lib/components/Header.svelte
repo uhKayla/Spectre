@@ -56,13 +56,13 @@
 			<Globe class="h-6 w-6" />
 			<span class="sr-only">Acme Inc</span>
 		</a>
-		<a href="/dash" class:text-foreground={$page.url.pathname === '/dash'} class:text-muted-foreground={$page.url.pathname !== '/dash'}>
+		<a href="/dash" class:text-foreground={$page.url.pathname === '/dash'} class:text-muted-foreground={$page.url.pathname !== '/dash'} class="hover:text-foreground">
 			Dashboard
 		</a>
-		<a href="/friends" class:text-foreground={$page.url.pathname === '/friends'} class:text-muted-foreground={$page.url.pathname !== '/friends'}>
+		<a href="/friends" class:text-foreground={$page.url.pathname === '/friends'} class:text-muted-foreground={$page.url.pathname !== '/friends'} class="hover:text-foreground">
 			Friends
 		</a>
-		<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'}>
+		<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground">
 			Feed
 		</a>
 	</nav>
@@ -79,9 +79,9 @@
 					<Globe class="h-6 w-6" />
 					<span class="sr-only">Acme Inc</span>
 				</a>
-				<a href="/dash" class:text-foreground={$page.url.pathname === '/dash'} class:text-muted-foreground={$page.url.pathname !== '/dash'}> Dashboard </a>
-				<a href="/friends" class:text-foreground={$page.url.pathname === '/friends'} class:text-muted-foreground={$page.url.pathname !== '/friends'}> Friends </a>
-				<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'}> Feed </a>
+				<a href="/dash" class:text-foreground={$page.url.pathname === '/dash'} class:text-muted-foreground={$page.url.pathname !== '/dash'} class="hover:text-foreground"> Dashboard </a>
+				<a href="/friends" class:text-foreground={$page.url.pathname === '/friends'} class:text-muted-foreground={$page.url.pathname !== '/friends'} class="hover:text-foreground"> Friends </a>
+				<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground"> Feed </a>
 			</nav>
 		</Sheet.Content>
 	</Sheet.Root>
