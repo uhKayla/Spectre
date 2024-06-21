@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 use reqwest::cookie::{CookieStore, Jar};
 use std::sync::{Arc, Mutex};
 use url::Url;
-use std::fs::File;
+use std::fs::{self, File};
 use std::io::{self, Read, Write};
+use tauri::api::path::app_data_dir;
 
 #[derive(Deserialize)]
 struct LoginParams {
@@ -42,11 +43,21 @@ struct RequestParams {
 #[derive(Default)]
 struct AppState {
     cookie_jar: Arc<Jar>,
+    config: tauri::Config,
 }
 
 impl AppState {
+    fn get_cookies_path(&self) -> io::Result<std::path::PathBuf> {
+        let app_data = app_data_dir(&self.config).ok_or(io::Error::new(io::ErrorKind::NotFound, "App data directory not found"))?;
+        Ok(app_data.join("cookies.json"))
+    }
+
     fn load_cookies(&self) -> io::Result<()> {
-        let mut file = File::open("cookies.json")?;
+        let path = self.get_cookies_path()?;
+        if !path.exists() {
+            return Ok(());
+        }
+        let mut file = File::open(path)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
         let url = Url::parse("https://api.vrchat.cloud").unwrap();
@@ -57,7 +68,11 @@ impl AppState {
     fn save_cookies(&self) -> io::Result<()> {
         let url = Url::parse("https://api.vrchat.cloud").unwrap();
         let cookies = self.cookie_jar.cookies(&url).unwrap_or_else(|| "".to_string().parse().unwrap());
-        let mut file = File::create("cookies.json")?;
+        let path = self.get_cookies_path()?;
+        if let Some(parent) = path.parent() {
+            fs::create_dir_all(parent)?;
+        }
+        let mut file = File::create(path)?;
         file.write_all(cookies.as_bytes())?;
         Ok(())
     }
@@ -258,7 +273,8 @@ async fn is_logged_in(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, 
 #[command]
 async fn get_cookies(state: State<'_, Mutex<AppState>>) -> Result<String, String> {
     let state_lock = state.lock().unwrap();
-    let mut file = File::open("cookies.json").map_err(|e| format!("Failed to open cookies file: {}", e))?;
+    let path = state_lock.get_cookies_path().map_err(|e| format!("Failed to get cookies path: {}", e))?;
+    let mut file = File::open(path).map_err(|e| format!("Failed to open cookies file: {}", e))?;
     let mut contents = String::new();
     file.read_to_string(&mut contents).map_err(|e| format!("Failed to read cookies file: {}", e))?;
 
@@ -282,14 +298,17 @@ async fn get_cookies(state: State<'_, Mutex<AppState>>) -> Result<String, String
     }
 }
 
-
 fn main() {
-    let state = Mutex::new(AppState::default());
+    let context = tauri::generate_context!();
+    let state = Mutex::new(AppState {
+        cookie_jar: Arc::new(Jar::default()),
+        config: context.config().clone(),
+    });
     state.lock().unwrap().load_cookies().unwrap_or_default();
 
     tauri::Builder::default()
         .manage(state)
         .invoke_handler(tauri::generate_handler![login, verify_two_factor, logout, get_request, make_request, is_logged_in, get_cookies])
-        .run(tauri::generate_context!())
+        .run(context)
         .expect("error while running tauri application");
 }
