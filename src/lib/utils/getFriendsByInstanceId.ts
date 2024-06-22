@@ -17,6 +17,7 @@ export const friendsByInstanceId = derived(
 					if (!instanceFriendsMap.has(instanceData.instanceId)) {
 						instanceFriendsMap.set(instanceData.instanceId, []);
 					}
+					// @ts-ignore
 					instanceFriendsMap.get(instanceData.instanceId).push(friend);
 				}
 			}

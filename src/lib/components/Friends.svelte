@@ -203,7 +203,7 @@
 											{friend.displayName}
 										</HoverCard.Trigger>
 										<HoverCard.Content class="w-80">
-											<div class="flex justify-between space-x-4">
+											<div class="flex space-x-4">
 												<Avatar.Root>
 													{#if friend.userIcon === null || friend.userIcon === ""}
 														<Avatar.Image src={friend.currentAvatarThumbnailImageUrl} />
@@ -215,21 +215,14 @@
 												<div class="space-y-1">
 													<h4 class="text-sm font-semibold">{friend.displayName}</h4>
 													<p class="text-sm whitespace-pre-line">{friend.statusDescription}</p>
-													<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.bio}
-													</div>
+													<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.status}</div>
+													<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.bio}</div>
 												</div>
 											</div>
 										</HoverCard.Content>
 									</HoverCard.Root>
 							</Dialog.Trigger>
 							<Dialog.Content>
-<!--								<Dialog.Header>-->
-<!--									<Dialog.Title>Are you sure absolutely sure?</Dialog.Title>-->
-<!--									<Dialog.Description>-->
-<!--										This action cannot be undone. This will permanently delete your account-->
-<!--										and remove your data from our servers.-->
-<!--									</Dialog.Description>-->
-<!--								</Dialog.Header>-->
 								<UserInfo userId={friend.id} />
 							</Dialog.Content>
 							</Dialog.Root>
@@ -245,7 +238,7 @@
 												{friend?.locationName} ({friend?.locationCount} / {friend?.locationData?.recommendedCapacity}) [{friend?.locationCapacity}]
 											</HoverCard.Trigger>
 											<HoverCard.Content class="w-80">
-												<div class="flex justify-between space-x-4">
+												<div class="flex space-x-4">
 													<Avatar.Root>
 															<Avatar.Image src={friend?.locationData?.thumbnailImageUrl} />
 														<Avatar.Fallback>SK</Avatar.Fallback>
@@ -271,7 +264,14 @@
 						<!--JoinButton-->
 						<Table.Cell class="text-right">
 							{#if friend.locationName !== "Private" && friend.locationName !== "On Website" }
-								<Button>Details</Button>
+								<Dialog.Root>
+									<Dialog.Trigger>
+										<Button>Details</Button>
+									</Dialog.Trigger>
+									<Dialog.Content>
+										<Instance userId="{friend.id}" />
+									</Dialog.Content>
+								</Dialog.Root>
 							{:else}
 								<Button disabled variant="outline" class="text-muted-foreground">Details</Button>
 							{/if}

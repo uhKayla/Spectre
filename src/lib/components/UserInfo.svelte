@@ -97,42 +97,44 @@
 	});
 </script>
 
-<div class="grid gap-8">
-	<div class="flex items-center gap-4">
-		<Avatar.Root class="hidden h-9 w-9 sm:flex">
-			<Avatar.Image src={user?.userIcon || user?.currentAvatarImageUrl} alt="Avatar" />
-			<Avatar.Fallback>{user?.displayName?.charAt(0).toUpperCase() || 'NA'}</Avatar.Fallback>
-		</Avatar.Root>
-		<div class="grid gap-1">
-			<p class="text-sm font-medium leading-none">
-				{user?.displayName || 'Username'}
-			</p>
-			<p class="text-sm text-muted-foreground">{user?.statusDescription || user?.status}</p>
+<div class="mt-5">
+	<div class="grid gap-8">
+		<div class="flex items-center gap-4">
+			<Avatar.Root class="hidden h-9 w-9 sm:flex">
+				<Avatar.Image src={user?.userIcon || user?.currentAvatarImageUrl} alt="Avatar" />
+				<Avatar.Fallback>{user?.displayName?.charAt(0).toUpperCase() || 'NA'}</Avatar.Fallback>
+			</Avatar.Root>
+			<div class="grid gap-1">
+				<p class="text-sm font-medium leading-none">
+					{user?.displayName || 'Username'}
+				</p>
+				<p class="text-sm text-muted-foreground">{user?.statusDescription || user?.status}</p>
+			</div>
+			<Button class="ml-auto font-medium">View Instance</Button>
 		</div>
-		<Button class="ml-auto font-medium">View Instance</Button>
-	</div>
-	<p>
-		{#each getFilteredTags(user?.tags) as tag}
-			{#if tagToBadgeMap[tag]}
-				<Badge variant="outline" style="border-color: {tagToColorMap[tag]}; color: white;">
-					{tagToBadgeMap[tag]}
-				</Badge>
-			{/if}
-		{/each}
-	</p>
-	<Separator class="" />
-	<div class="flex flex-col space-y-2">
-		<h1>Bio:</h1>
-		<ScrollArea class="h-40 rounded-md border p-4" orientation="both">
-			<p class="text-sm" style="white-space: pre-line">{user?.bio}</p>
-		</ScrollArea>
-	</div>
-	<div class="flex flex-col space-y-2">
-		<h1>Links:</h1>
-		<div class="flex gap-4">
-			{#each user?.bioLinks ?? [] as link}
-				<Button variant="ghost" size="icon" on:click={openUrl(link)}><svelte:component this={getIconForLink(link)} /></Button>
+		<p>
+			{#each getFilteredTags(user?.tags) as tag}
+				{#if tagToBadgeMap[tag]}
+					<Badge variant="outline" style="border-color: {tagToColorMap[tag]}; color: white;">
+						{tagToBadgeMap[tag]}
+					</Badge>
+				{/if}
 			{/each}
+		</p>
+		<Separator class="" />
+		<div class="flex flex-col space-y-2">
+			<h1>Bio:</h1>
+			<ScrollArea class="h-40 rounded-md border p-4" orientation="both">
+				<p class="text-sm" style="white-space: pre-line">{user?.bio}</p>
+			</ScrollArea>
+		</div>
+		<div class="flex flex-col space-y-2">
+			<h1>Links:</h1>
+			<div class="flex gap-4">
+				{#each user?.bioLinks ?? [] as link}
+					<Button variant="ghost" size="icon" on:click={openUrl(link)}><svelte:component this={getIconForLink(link)} /></Button>
+				{/each}
+			</div>
 		</div>
 	</div>
 </div>
