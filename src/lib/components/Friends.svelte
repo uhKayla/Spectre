@@ -15,6 +15,7 @@
 	import { LucideRefreshCw, User } from 'lucide-svelte';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import UserInfo from '$lib/components/UserInfo.svelte'
+	import Instance from '$lib/components/Instance.svelte';
 
 	let loading = !get(friends).size || !get(externalUserData).size || !get(instanceDataStore).size;
 
@@ -236,36 +237,30 @@
 
 						<!--Location-->
 						<Table.Cell>
-							{#if friend.locationName !== "Private" && friend.locationName !== "On Website"}
+							{#if friend?.locationName !== "Private" && friend?.locationName !== "On Website"}
 								<Dialog.Root>
 									<Dialog.Trigger>
 										<HoverCard.Root>
 											<HoverCard.Trigger>
-												{friend.locationName} ({friend.locationCount} / {friend.locationData.recommendedCapacity}) [{friend.locationCapacity}]
+												{friend?.locationName} ({friend?.locationCount} / {friend?.locationData?.recommendedCapacity}) [{friend?.locationCapacity}]
 											</HoverCard.Trigger>
 											<HoverCard.Content class="w-80">
 												<div class="flex justify-between space-x-4">
 													<Avatar.Root>
-															<Avatar.Image src={friend.locationData.thumbnailImageUrl} />
+															<Avatar.Image src={friend?.locationData?.thumbnailImageUrl} />
 														<Avatar.Fallback>SK</Avatar.Fallback>
 													</Avatar.Root>
 													<div class="space-y-1">
-														<h4 class="text-sm font-semibold">{friend.locationName}</h4>
-														<p class="text-xs whitespace-pre-line">{friend.locationData.description}</p>
-														<div class="text-xs text-muted-foreground flex items-center pt-2">{friend.locationCount} / {friend.locationData.recommendedCapacity} ({friend.locationCapacity})</div>
+														<h4 class="text-sm font-semibold">{friend?.locationName}</h4>
+														<p class="text-xs whitespace-pre-line">{friend?.locationData?.description}</p>
+														<div class="text-xs text-muted-foreground flex items-center pt-2">{friend?.locationCount} / {friend?.locationData?.recommendedCapacity} ({friend?.locationCapacity})</div>
 													</div>
 												</div>
 											</HoverCard.Content>
 										</HoverCard.Root>
 									</Dialog.Trigger>
 									<Dialog.Content>
-										<Dialog.Header>
-											<Dialog.Title>Are you sure absolutely sure?</Dialog.Title>
-											<Dialog.Description>
-												This action cannot be undone. This will permanently delete your account
-												and remove your data from our servers.
-											</Dialog.Description>
-										</Dialog.Header>
+										<Instance userId="{friend.id}" />
 									</Dialog.Content>
 								</Dialog.Root>
 							{:else}

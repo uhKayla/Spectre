@@ -39,22 +39,31 @@
 	{#if loading}
 		<div class="loading">Loading...</div>
 	{:else if avatarData}
-		<ScrollArea class="h-[300px]">
+<!--		<ScrollArea class="h-[300px]">-->
 			<Card.Root>
 				<Card.Header>
+					<img src="{avatarData.imageUrl}" alt="{avatarData.name}" class="h-[240px] object-cover" />
 					<h1 class="text-2xl">Current Avatar</h1>
 					<h2 class="text-lg">{avatarData.name}</h2>
-					<img src="{avatarData.imageUrl}" alt="{avatarData.name}" class="h-[100px]" />
 				</Card.Header>
 				<Card.Content>
 					{#if avatarData.description !== avatarData.name}
 						<p>{avatarData.description}</p>
 					{/if}
-					<p>Author: {avatarData.authorName}</p>
-					<p>Release Status: {avatarData.releaseStatus}</p>
+					<p>
+						Author:
+						<code class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+							{avatarData.authorName}
+						</code>
+					</p>
+					<p>Release Status:
+						<code class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
+							{avatarData.releaseStatus}
+						</code>
+					</p>
 				</Card.Content>
 			</Card.Root>
-		</ScrollArea>
+<!--		</ScrollArea>-->
 	{:else}
 		<div class="error">No avatar data found.</div>
 	{/if}

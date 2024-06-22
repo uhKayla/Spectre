@@ -5,7 +5,7 @@ import pLimit from 'p-limit';
 
 const limit = pLimit(30); // Limit to 30 requests per second
 
-const loadUser = async (userId: string): Promise<ExternalUserData> => {
+export const loadUser = async (userId: string): Promise<ExternalUserData> => {
 	try {
 		const response = await invoke<string>('make_request', {
 			params: {
@@ -14,6 +14,7 @@ const loadUser = async (userId: string): Promise<ExternalUserData> => {
 				body: null
 			}
 		});
+		console.log(response);
 		return JSON.parse(response);
 	} catch (error) {
 		console.error('Error user:', error);

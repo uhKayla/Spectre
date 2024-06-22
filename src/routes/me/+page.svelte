@@ -12,11 +12,11 @@
     }
 </style>
 
-<div class="p-1">
-	<Card.Root class="w-[500px] p-4">
+<main class="">
+	<Card.Root class="w-[700px] p-4">
 		<Card.Content>
 			<Me />
 		</Card.Content>
 	</Card.Root>
 
-</div>
+</main>

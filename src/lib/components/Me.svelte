@@ -34,7 +34,6 @@
 	});
 
 	onMount(() => {
-		// Clean up the subscription when the component is unmounted
 		return () => {
 			unsubscribe();
 		};
@@ -113,7 +112,7 @@
 	}
 </script>
 
-<div class="grid gap-8">
+<div class="grid gap-8 mt-5">
 	<div class="flex items-center gap-4">
 		<Avatar.Root class="hidden h-9 w-9 sm:flex">
 			<Avatar.Image src={currentUser?.userIcon || currentUser?.currentAvatarImageUrl} alt="Avatar" />
@@ -137,7 +136,7 @@
 		{/each}
 	</p>
 	<Separator />
-	<Tabs.Root value="bio" class="w-[400px]">
+	<Tabs.Root value="bio" class="w-[620px]">
 		<Tabs.List class="grid w-full grid-cols-4">
 			<Tabs.Trigger value="bio">Bio</Tabs.Trigger>
 			<Tabs.Trigger value="avatar">Avatars</Tabs.Trigger>
