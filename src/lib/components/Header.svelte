@@ -63,9 +63,9 @@
 		<a href="/friends" class:text-foreground={$page.url.pathname === '/friends'} class:text-muted-foreground={$page.url.pathname !== '/friends'} class="hover:text-foreground">
 			Friends
 		</a>
-		<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground">
-			Feed
-		</a>
+<!--		<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground">-->
+<!--			Feed-->
+<!--		</a>-->
 	</nav>
 	<Sheet.Root>
 		<Sheet.Trigger asChild let:builder>
@@ -82,7 +82,7 @@
 				</a>
 				<a href="/dash" class:text-foreground={$page.url.pathname === '/dash'} class:text-muted-foreground={$page.url.pathname !== '/dash'} class="hover:text-foreground"> Dashboard </a>
 				<a href="/friends" class:text-foreground={$page.url.pathname === '/friends'} class:text-muted-foreground={$page.url.pathname !== '/friends'} class="hover:text-foreground"> Friends </a>
-				<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground"> Feed </a>
+<!--				<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground"> Feed </a>-->
 			</nav>
 		</Sheet.Content>
 	</Sheet.Root>

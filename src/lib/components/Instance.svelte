@@ -137,9 +137,5 @@
 				{/each}
 			</div>
 		</div>
-		<div>
-			{instance?.worldId}
-			{instance?.instanceId}
-		</div>
 	</div>
 </div>
