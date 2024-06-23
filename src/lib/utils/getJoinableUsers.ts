@@ -10,7 +10,7 @@ export const getJoinableUsers = (): number => {
 
 	friendsData.forEach(friend => {
 		const user = userData.get(friend.id);
-		if (user?.state === 'online' && user?.status === 'active') {
+		if (user?.location !== "private") {
 			joinableUsersCount++;
 		}
 	});

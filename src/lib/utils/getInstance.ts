@@ -11,6 +11,7 @@ export const loadInstance = async (locationId: string): Promise<InstanceData> =>
 			}
 		});
 		const location: InstanceData = JSON.parse(response);
+		console.log(location);
 		return location;
 	} catch (error) {
 		console.error(`Error fetching location data for ${locationId}:`, error);
