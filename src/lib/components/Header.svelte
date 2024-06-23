@@ -17,6 +17,7 @@
 	import CircleUser from 'lucide-svelte/icons/circle-user';
 	import Menu from 'lucide-svelte/icons/menu';
 	import Globe from 'lucide-svelte/icons/globe';
+	import Logo from '$lib/assets/favicon.png'
 	import type { UserData } from '$lib/types/user';
 
 	let currentUser: UserData | null;
@@ -54,7 +55,7 @@
 <header class="header sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
 	<nav class="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
 		<a href="/" class="flex items-center gap-2 text-lg font-semibold md:text-base">
-			<Globe class="h-6 w-6" />
+			<img class="h-4/6 w-4/6" alt="Spectre Logo" src="{Logo}"/>
 			<span class="sr-only">Spectre VRC</span>
 		</a>
 		<a href="/dash" class:text-foreground={$page.url.pathname === '/dash'} class:text-muted-foreground={$page.url.pathname !== '/dash'} class="hover:text-foreground">

@@ -110,7 +110,7 @@
 				</p>
 				<p class="text-sm text-muted-foreground">{user?.statusDescription || user?.status}</p>
 			</div>
-			<Button class="ml-auto font-medium">View Instance</Button>
+			<Button disabled class="ml-auto" variant="outline" size="icon">...</Button>
 		</div>
 		<p>
 			{#each getFilteredTags(user?.tags) as tag}

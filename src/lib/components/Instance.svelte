@@ -22,6 +22,7 @@
 	import type { GroupData } from '$lib/types/group';
 	import { loadGroup } from '$lib/utils/getGroupById';
 	import { sendInviteToMyself } from '$lib/utils/postInviteSelfToInstance';
+	import { toast } from 'svelte-sonner';
 
 	export let userId: string;
 	let instance: InstanceData | undefined;
@@ -30,7 +31,18 @@
 	let friendsInInstance: Friend[] = [];
 
 	const openUrl = (link: string) => {
-		open(link)
+		open(link);
+		toast("Opening instance in browser...")
+	}
+
+	const joinUrl = (link: string) => {
+		open(link);
+		toast("Joining instance through weblink...")
+	}
+
+	const inviteMyself = (worldId: string, instanceId: string) => {
+		sendInviteToMyself(worldId, instanceId);
+		toast("Invite sent!");
 	}
 
 	onMount(async () => {
@@ -53,7 +65,7 @@
 
 		<!--Section-->
 		<div class="flex items-center gap-4">
-			<Avatar.Root class="hidden h-9 w-9 sm:flex">
+			<Avatar.Root class="hidden h-11 w-11 sm:flex">
 				<Avatar.Image src={instance?.world.thumbnailImageUrl} alt="World Thumbnail" />
 				<Avatar.Fallback>{instance?.world?.name?.charAt(0).toUpperCase() || 'NA'}</Avatar.Fallback>
 			</Avatar.Root>
@@ -62,6 +74,21 @@
 					{instance?.world.name || 'World Name'}
 				</p>
 				<p class="text-sm text-muted-foreground">({instance?.userCount} / {instance?.recommendedCapacity}) [{instance?.capacity}]</p>
+				<p class="text-sm text-muted-foreground">
+					{#if instance?.type === "hidden"} Friends+
+					{:else if instance?.type === "friends"} Friends
+					{:else if instance?.type === "group"}
+						{#if instance?.groupAccessType === "plus"}
+							Group+
+						{:else if instance?.groupAccessType === "public"}
+							Group Public
+						{:else}
+							Group
+						{/if}
+					{:else if instance?.type === "public"} Public
+					{:else} Public
+					{/if}
+				</p>
 			</div>
 			<div class="ml-auto">
 				<DropdownMenu.Root>
@@ -72,8 +99,8 @@
 						<DropdownMenu.Group>
 							<DropdownMenu.Label>Options</DropdownMenu.Label>
 							<DropdownMenu.Separator />
-							<DropdownMenu.Item on:click={openUrl(`vrchat://launch?ref=vrchat.com&id=${instance?.worldId}:${instance?.instanceId}`)}>Join Instance</DropdownMenu.Item>
-							<DropdownMenu.Item on:click={sendInviteToMyself(instance?.worldId, instance?.instanceId)}>Invite Me</DropdownMenu.Item>
+							<DropdownMenu.Item on:click={joinUrl(`vrchat://launch?ref=vrchat.com&id=${instance?.worldId}:${instance?.instanceId}`)}>Join Instance</DropdownMenu.Item>
+							<DropdownMenu.Item on:click={inviteMyself(instance?.worldId, instance?.instanceId)}>Invite Me</DropdownMenu.Item>
 							<DropdownMenu.Item on:click={openUrl(`https://vrchat.com/home/launch?worldId=${instance?.worldId}&instanceId=${instance?.instanceId}`)}>Open Instance</DropdownMenu.Item>
 						</DropdownMenu.Group>
 					</DropdownMenu.Content>
@@ -92,7 +119,7 @@
 		<!--Section-->
 		<div class="flex flex-col space-y-2">
 			<h1>Users:</h1>
-			<div class="flex gap-4">
+			<div class="grid grid-cols-2 gap-4">
 				{#if instanceOwnerUser !== undefined}
 					<div class="flex items-center gap-4">
 						<Avatar.Root class="hidden h-9 w-9 sm:flex">

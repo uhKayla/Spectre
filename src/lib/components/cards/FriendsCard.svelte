@@ -19,7 +19,7 @@
 		</div>
 	</Card.Content>
 	<Card.Footer class="flex justify-center items-center">
-		<Button>Friends List</Button>
+		<Button href="/friends">Friends List</Button>
 	</Card.Footer>
 </Card.Root>
 
