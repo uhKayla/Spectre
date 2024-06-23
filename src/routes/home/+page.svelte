@@ -6,6 +6,7 @@
 	import { user } from '$lib/stores/user';
 	import type { UserData } from '$lib/types/user';
 	import { goto } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 
 	let onlineFriendsCount = 0;
 

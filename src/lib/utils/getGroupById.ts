@@ -11,7 +11,6 @@ export const loadGroup = async (groupId: string): Promise<GroupData> => {
 			}
 		});
 		const group: GroupData = JSON.parse(response);
-		console.log(group);
 		return group;
 	} catch (error) {
 		console.error(`Error fetching location data for ${groupId}:`, error);
