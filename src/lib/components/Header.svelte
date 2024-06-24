@@ -1,4 +1,3 @@
-<!-- src/lib/components/Header.svelte -->
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { toggleMode } from 'mode-watcher';
@@ -67,6 +66,9 @@
 <!--		<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground">-->
 <!--			Feed-->
 <!--		</a>-->
+		<a href="/worlds" class:text-foreground={$page.url.pathname === '/worlds'} class:text-muted-foreground={$page.url.pathname !== '/worlds'} class="hover:text-foreground">
+			Worlds
+		</a>
 	</nav>
 	<Sheet.Root>
 		<Sheet.Trigger asChild let:builder>
@@ -84,6 +86,7 @@
 				<a href="/dash" class:text-foreground={$page.url.pathname === '/dash'} class:text-muted-foreground={$page.url.pathname !== '/dash'} class="hover:text-foreground"> Dashboard </a>
 				<a href="/friends" class:text-foreground={$page.url.pathname === '/friends'} class:text-muted-foreground={$page.url.pathname !== '/friends'} class="hover:text-foreground"> Friends </a>
 <!--				<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground"> Feed </a>-->
+				<a href="/worlds" class:text-foreground={$page.url.pathname === '/worlds'} class:text-muted-foreground={$page.url.pathname !== '/worlds'} class="hover:text-foreground"> Worlds </a>
 			</nav>
 		</Sheet.Content>
 	</Sheet.Root>
