@@ -13,7 +13,7 @@
 		</div>
 	</Card.Content>
 	<Card.Footer class="flex justify-center items-center">
-		<Button disabled>Discover Worlds</Button>
+		<Button href="/worlds">Discover Worlds</Button>
 	</Card.Footer>
 </Card.Root>
 
