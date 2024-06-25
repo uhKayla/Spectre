@@ -5,7 +5,6 @@
 	import { getUsersOnline } from '$lib/utils/getUsersOnline';
 	import { onMount } from 'svelte';
 	import { getApiTime } from '$lib/utils/getApiTime';
-	import Ticker from '$lib/components/content/Ticker.svelte';
 
 	let onlineFriendsCount = 0;
 	let onlineUsers = 0;
