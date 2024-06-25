@@ -66,7 +66,7 @@
 <!--		<a href="/feed" class:text-foreground={$page.url.pathname === '/feed'} class:text-muted-foreground={$page.url.pathname !== '/feed'} class="hover:text-foreground">-->
 <!--			Feed-->
 <!--		</a>-->
-		<a href="/worlds" class:text-foreground={$page.url.pathname === '/worlds'} class:text-muted-foreground={$page.url.pathname !== '/worlds'} class="hover:text-foreground">
+		<a href="/worlds" class:text-foreground={$page.url.pathname === '/worlds/search'} class:text-muted-foreground={$page.url.pathname !== '/worlds'} class="hover:text-foreground">
 			Worlds
 		</a>
 	</nav>

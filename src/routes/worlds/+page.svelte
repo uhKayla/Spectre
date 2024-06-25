@@ -7,6 +7,7 @@
 	import { writable } from 'svelte/store';
 	import { Input } from '$lib/components/ui/input';
 	import { Search } from 'lucide-svelte';
+	import { goto } from '$app/navigation'
 
 	// Declare the store at the top level
 	const currentPage = writable(0);
@@ -29,6 +30,14 @@
 	currentPage.subscribe(value => {
 		current_page_value = value;
 	});
+
+	let searchQuery = '';
+
+	function handleSearch() {
+		if (searchQuery.trim()) {
+			goto(`/worlds/${searchQuery}`);
+		}
+	}
 </script>
 
 <main>
@@ -43,6 +52,8 @@
 					type="search"
 					placeholder="Search..."
 					class="w-full rounded-lg bg-background pl-8 md:w-[200px] lg:w-[336px]"
+					bind:value={searchQuery}
+					on:keydown={(event) => event.key === 'Enter' && handleSearch()}
 				/>
 			</div>
 		</div>
