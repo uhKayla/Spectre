@@ -76,7 +76,7 @@
 							<div class="text-2xl">{world.name}</div>
 						</Sheet.Title>
 						<Sheet.Description>
-							<div class="text-lg text-muted-foreground">By {world.authorName}</div>
+							<div class="text-lg text-muted-foreground">By: {world.authorName}</div>
 							<br>
 							<Card.Root>
 								<Card.Header>
