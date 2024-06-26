@@ -72,7 +72,7 @@
 	<div class="col-span-2 p-4 gap-4 h-1/2">
 		<TotalPlayerCard totalOnline={onlineUsers} />
 	</div>
-	<div class="p-4 gap-4 h-1/2">
+	<div class="p-4 gap-4">
 		<BarCard />
 	</div>
 	<div class="p-4 gap-4 h-1/2">

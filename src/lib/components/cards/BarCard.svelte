@@ -7,15 +7,9 @@
 </script>
 
 
-<Card.Root class="flex flex-col justify-between h-64">
-	<Card.Header>
-
-	</Card.Header>
-	<Card.Content class="flex justify-center items-center">
+<Card.Root class="flex flex-col h-64 justify-center items-center object-center">
+	<Card.Content class="flex justify-center items-center object-center p-6">
 		<Bars />
 	</Card.Content>
-	<Card.Footer class="flex justify-center items-center">
-
-	</Card.Footer>
 </Card.Root>
 
