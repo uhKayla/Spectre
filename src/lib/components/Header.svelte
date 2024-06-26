@@ -116,10 +116,12 @@
 					{/if}
 				</DropdownMenu.Item>
 				<DropdownMenu.Separator />
-				<DropdownMenu.Item href="/user/test">Settings</DropdownMenu.Item>
+				<DropdownMenu.Item disabled href="/user/test">Settings</DropdownMenu.Item>
 				<DropdownMenu.Item on:click={openGithub}>Github</DropdownMenu.Item>
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item on:click={logout}>Logout</DropdownMenu.Item>
+				<DropdownMenu.Separator />
+				<DropdownMenu.Item disabled>v0.1.7-ALPHA.0</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>
