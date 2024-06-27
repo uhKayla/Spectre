@@ -1,4 +1,4 @@
-![logobanner.png](assets/logobanner.png)
+![spectre_800x267.gif](assets/spectre_800x267.gif)
 
 # Spectre
 A lightweight friends list manager for VRChat. Built on Sveltekit + Tauri. Thanks to Tauri, Spectre is cross-platform by default*, with potential support for mobile in the future.
@@ -37,3 +37,9 @@ cargo tauri build
 - [Community-driven VRCAPI Docs](https://vrchatapi.github.io/docs/api/)
 - [shadcn-svelte](https://www.shadcn-svelte.com/)
 - @Auros for help learning
+
+## Screenshots
+![img_1.png](assets/img_1.png)
+![img.png](assets/img.png)
+![fl.png](assets/fl.png)
+![worlds.png](assets/worlds.png)
