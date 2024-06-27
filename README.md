@@ -37,3 +37,9 @@ cargo tauri build
 - [Community-driven VRCAPI Docs](https://vrchatapi.github.io/docs/api/)
 - [shadcn-svelte](https://www.shadcn-svelte.com/)
 - @Auros for help learning
+
+## Screenshots
+![img_1.png](assets/img_1.png)
+![img.png](assets/img.png)
+![fl.png](assets/fl.png)
+![worlds.png](assets/worlds.png)
