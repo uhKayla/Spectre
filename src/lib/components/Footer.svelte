@@ -6,6 +6,7 @@
 	import { onMount } from 'svelte';
 	import { getApiTime } from '$lib/utils/getApiTime';
 	import { getOnlineUsers } from '$lib/utils/getOnlineUsers';
+	import { open } from '@tauri-apps/api/shell';
 
 	let onlineFriendsCount = 0;
 	let onlineUsers = 0;
@@ -39,6 +40,10 @@
 			currentTime = 'Invalid Date';
 		}
 	}
+
+	const openAw = () => {
+		open('https://angelware.net');
+	};
 
 	onMount(async () => {
 		try {
@@ -116,7 +121,7 @@
 		<div class="font-mono ticker-wrapper">
 			<div class="hwrap">
 				<div class="hmove">
-					<div class="hitem">Made with ❤️ by ANGELWARE</div>
+					<div class="hitem" on:click={openAw}>Made with ❤️ by ANGELWARE</div>
 					<div class="hitem">Online Friends: {onlineFriendsCount}</div>
 					<div class="hitem">Online Users: {onlineUsers}</div>
 					<div class="hitem">VRChat Time: {currentTime}</div>
