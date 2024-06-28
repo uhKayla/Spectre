@@ -7,17 +7,25 @@
 	import type { UserData } from '$lib/types/user';
 	import { goto } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
+	import { onMount } from 'svelte';
+	import { loadData, reloadData } from '$lib/functions/loadData';
+	import { getOnlineUsers } from '$lib/utils/getOnlineUsers';
 
 	let onlineFriendsCount = 0;
 
 	// Subscribe to the user store and get the online friends count
-	user.subscribe((userData: UserData | null) => {
-		if (userData) {
-			onlineFriendsCount = userData.onlineFriends.length;
-		} else {
-			// If userData is null, redirect to home page
-			goto('/');
-		}
+	// user.subscribe((userData: UserData | null) => {
+	// 	if (userData) {
+	// 		onlineFriendsCount = userData.onlineFriends.length;
+	// 	} else {
+	// 		// If userData is null, redirect to home page
+	// 		goto('/');
+	// 	}
+	// });
+
+	onMount(async () => {
+		await reloadData(false);
+		onlineFriendsCount = await getOnlineUsers();
 	});
 </script>
 

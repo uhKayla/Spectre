@@ -121,7 +121,7 @@
 				<DropdownMenu.Separator />
 				<DropdownMenu.Item on:click={logout}>Logout</DropdownMenu.Item>
 				<DropdownMenu.Separator />
-				<DropdownMenu.Item disabled>v0.1.7-ALPHA.0</DropdownMenu.Item>
+				<DropdownMenu.Item disabled>v0.1.8-ALPHA</DropdownMenu.Item>
 			</DropdownMenu.Content>
 		</DropdownMenu.Root>
 	</div>

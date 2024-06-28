@@ -19,6 +19,8 @@
 	import { externalUserData } from '$lib/stores/externalUserStore';
 	import { instanceDataStore } from '$lib/stores/instanceStore';
 	import { loadFriendsAndUserData } from '$lib/utils/loadFriendList';
+	import { reloadData } from '$lib/functions/loadData';
+	import { getOnlineUsers } from '$lib/utils/getOnlineUsers';
 
 	// Subscribe to the user store and get the online friends count
 	let onlineFriendsCount = 0;
@@ -26,23 +28,29 @@
 	let onlineUsers = 0;
 	let loading = true;
 
-	user.subscribe((userData: UserData | null) => {
-		if (userData) {
-			onlineFriendsCount = userData.onlineFriends.length;
-		} else {
-			// If userData is null, redirect to home page
-			goto('/');
-		}
-	});
+	// user.subscribe((userData: UserData | null) => {
+	// 	if (userData) {
+	// 		onlineFriendsCount = userData.onlineFriends.length;
+	// 	} else {
+	// 		// If userData is null, redirect to home page
+	// 		goto('/');
+	// 	}
+	// });
 
 	onMount(async () => {
-		joinableUsersCount = getJoinableUsers();
+		loading = true;
+		await reloadData(false);
+
+		onlineFriendsCount = await getOnlineUsers();
+
+		joinableUsersCount = await getJoinableUsers();
 		console.log(joinableUsersCount);
 
 		onlineUsers = await getUsersOnline();
 		console.log(onlineUsers);
 
 		await initializeData();
+		loading = false;
 	});
 
 	const initializeData = async (forceReload = false) => {
@@ -59,6 +67,9 @@
 	};
 </script>
 
+{#if loading}
+	<div>loading...</div>
+{:else}
 <div class="grid grid-cols-4 p-4 h-1/2">
 	<div class="p-4 gap-4">
 		<FriendsCard friendsOnline={onlineFriendsCount} />
@@ -79,3 +90,4 @@
 		<EventsCard />
 	</div>
 </div>
+{/if}
