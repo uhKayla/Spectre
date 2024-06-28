@@ -5,17 +5,18 @@
 	import { getUsersOnline } from '$lib/utils/getUsersOnline';
 	import { onMount } from 'svelte';
 	import { getApiTime } from '$lib/utils/getApiTime';
+	import { getOnlineUsers } from '$lib/utils/getOnlineUsers';
 
 	let onlineFriendsCount = 0;
 	let onlineUsers = 0;
 	let dateTime: string = '';
 	let currentTime: string = 'Loading...';
 
-	user.subscribe((userData: UserData | null) => {
-		if (userData) {
-			onlineFriendsCount = userData.onlineFriends.length;
-		}
-	});
+	// user.subscribe((userData: UserData | null) => {
+	// 	if (userData) {
+	// 		onlineFriendsCount = userData.onlineFriends.length;
+	// 	}
+	// });
 
 	function cleanDateTimeString(dateTime: string): string {
 		// Remove any extraneous quotes and trim the string
@@ -41,6 +42,7 @@
 
 	onMount(async () => {
 		try {
+			onlineFriendsCount = await getOnlineUsers();
 			onlineUsers = await getUsersOnline();
 			dateTime = await getApiTime();
 			if (!dateTime) {

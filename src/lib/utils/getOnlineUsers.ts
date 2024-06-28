@@ -2,7 +2,7 @@ import { get } from 'svelte/store';
 import { friends } from '$lib/stores/friendsStore';
 import { externalUserData } from '$lib/stores/externalUserStore';
 
-export const getJoinableUsers = async () => {
+export const getOnlineUsers = async () => {
 	const friendsData = get(friends);
 	const userData = get(externalUserData);
 
@@ -10,10 +10,11 @@ export const getJoinableUsers = async () => {
 
 	friendsData.forEach(friend => {
 		const user = userData.get(friend.id);
-		if (user?.location !== "private" && user?.location !== "offline") {
+		if (user?.location !== "offline" && user?.location !== "" && user?.status !== "offline" && user?.state !== "active") {
 			joinableUsersCount++;
 		}
-	});
+	}
+);
 
 	return joinableUsersCount;
 };
