@@ -6,6 +6,7 @@
 	import { Label } from "$lib/components/ui/label/index.js";
 	import { encode as base64_encode } from 'js-base64';
 	import { goto } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 
 	let email = '';
 	let password = '';
@@ -25,15 +26,18 @@
 			if (result.requires_two_factor_auth) {
 				requiresTwoFactorAuth = true;
 				useEmailOtp = result.requires_two_factor_auth.includes('emailOtp');
+				toast("Check your email or device for your two-factor code!");
 			}
 			else {
 				responseMessage = result.message || `User: ${result.displayname}`;
-				goto("/home")
+				toast("Successfully logged in!");
+				goto("/home");
 			}
 			console.log(result);
 		}
 		catch (error) {
 			responseMessage = error;
+			toast("An error occured!");
 			console.error(error);
 		}
 	}
@@ -50,10 +54,12 @@
 			requiresTwoFactorAuth = false;
 			useEmailOtp = false;
 			console.log(result);
+			toast("Successfully logged in!");
 			goto("/home")
 		}
 		catch (error) {
 			responseMessage = error;
+			toast("An error occured!");
 			console.error(error);
 		}
 	}
@@ -87,5 +93,5 @@
 			<Button class="w-full" on:click={login}>Sign in</Button>
 		{/if}
 	</Card.Footer>
-	<p>{responseMessage}</p>
+<!--	<p>{responseMessage}</p>-->
 </Card.Root>
