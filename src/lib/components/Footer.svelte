@@ -87,13 +87,13 @@
 
     .ticker-wrapper::before {
         left: 0;
-        background: linear-gradient(to right, #09090b, transparent);
+        background: linear-gradient(to right, hsl(var(--background)), transparent);
         z-index: 1;
     }
 
     .ticker-wrapper::after {
         right: 0;
-        background: linear-gradient(to left, #09090b, transparent);
+        background: linear-gradient(to left, hsl(var(--background)), transparent);
     }
 
 		/* ticker https://code-boxx.com/html-css-news-ticker-horizontal-vertical/*/
