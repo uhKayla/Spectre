@@ -65,7 +65,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://github.com/uhKayla/Spectre/master/latest.json"
+        "https://github.com/uhKayla/Spectre/releases/download/v0.1.10-alpha/latest.json"
       ],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQzQUY4OTIzMDVDOTgzMjQKUldRa2c4a0ZJNG12MDBvNHdIa0VRMXhKcVhqbTgyWXVTTVBoUmFGcEowMFd5cjVpbEoxc1hha3AK"
