@@ -8,7 +8,6 @@ use url::Url;
 use std::fs::{self, File};
 use std::io::{self, Read, Write};
 use tauri::api::path::app_data_dir;
-use serde_json::json;
 
 #[derive(Deserialize)]
 struct LoginParams {
@@ -61,52 +60,21 @@ impl AppState {
         let mut file = File::open(path)?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
-        let cookies: serde_json::Value = serde_json::from_str(&contents)?;
         let url = Url::parse("https://api.vrchat.cloud").unwrap();
-        if let Some(auth) = cookies["auth"].as_str() {
-            self.cookie_jar.add_cookie_str(auth, &url);
-        }
-        if let Some(two_factor_auth) = cookies["twoFactorAuth"].as_str() {
-            self.cookie_jar.add_cookie_str(two_factor_auth, &url);
-        }
+        self.cookie_jar.add_cookie_str(&contents, &url);
         Ok(())
     }
 
     fn save_cookies(&self) -> io::Result<()> {
         let url = Url::parse("https://api.vrchat.cloud").unwrap();
-        let cookies = self.cookie_jar.cookies(&url).unwrap_or_else(|| "".parse().unwrap());
-        let cookie_str = cookies.to_str().unwrap_or("");
-
-        let cookie_pairs: Vec<&str> = cookie_str.split(';').collect();
-
-        let mut cookie_map = json!({});
-        for pair in cookie_pairs {
-            let kv: Vec<&str> = pair.split('=').collect();
-            if kv.len() == 2 {
-                let key = kv[0].trim();
-                let value = kv[1].trim();
-                cookie_map[key] = json!(value);
-            }
-        }
-
+        let cookies = self.cookie_jar.cookies(&url).unwrap_or_else(|| "".to_string().parse().unwrap());
         let path = self.get_cookies_path()?;
         if let Some(parent) = path.parent() {
             fs::create_dir_all(parent)?;
         }
         let mut file = File::create(path)?;
-        file.write_all(cookie_map.to_string().as_bytes())?;
+        file.write_all(cookies.as_bytes())?;
         Ok(())
-    }
-
-    fn get_auth_cookie(&self) -> Option<String> {
-        let url = Url::parse("https://api.vrchat.cloud").unwrap();
-        self.cookie_jar.cookies(&url)
-            .and_then(|cookies| cookies.to_str().ok().map(|s| s.to_string()))
-            .and_then(|cookie_str| {
-                cookie_str.split(';')
-                    .find(|cookie| cookie.trim().starts_with("auth="))
-                    .map(|cookie| cookie.to_string())
-            })
     }
 }
 
@@ -152,7 +120,6 @@ async fn login(params: LoginParams, state: tauri::State<'_, Mutex<AppState>>) ->
 #[command]
 async fn verify_two_factor(params: TwoFactorParams, state: tauri::State<'_, Mutex<AppState>>) -> Result<String, String> {
     let cookie_jar = state.lock().unwrap().cookie_jar.clone();
-    let auth_cookie = state.lock().unwrap().get_auth_cookie().ok_or("Auth cookie not found")?;
     let client = reqwest::Client::builder()
         .cookie_store(true)
         .cookie_provider(cookie_jar)
@@ -168,7 +135,6 @@ async fn verify_two_factor(params: TwoFactorParams, state: tauri::State<'_, Mute
     let response = client
         .post(url)
         .header("User-Agent", "Spectre/1.0")
-        .header("Cookie", auth_cookie)
         .json(&serde_json::json!({ "code": params.code }))
         .send()
         .await;
@@ -223,7 +189,6 @@ async fn logout(state: tauri::State<'_, Mutex<AppState>>) -> Result<String, Stri
 #[command]
 async fn get_request(state: tauri::State<'_, Mutex<AppState>>) -> Result<String, String> {
     let cookie_jar = state.lock().unwrap().cookie_jar.clone();
-    let auth_cookie = state.lock().unwrap().get_auth_cookie().ok_or("Auth cookie not found")?;
     let client = reqwest::Client::builder()
         .cookie_store(true)
         .cookie_provider(cookie_jar.clone())
@@ -235,7 +200,6 @@ async fn get_request(state: tauri::State<'_, Mutex<AppState>>) -> Result<String,
     let response = client
         .get(url)
         .header("User-Agent", "Spectre/1.0")
-        .header("Cookie", auth_cookie)
         .send()
         .await;
 
@@ -257,7 +221,6 @@ async fn get_request(state: tauri::State<'_, Mutex<AppState>>) -> Result<String,
 #[command]
 async fn make_request(params: RequestParams, state: tauri::State<'_, Mutex<AppState>>) -> Result<String, String> {
     let cookie_jar = state.lock().unwrap().cookie_jar.clone();
-    let auth_cookie = state.lock().unwrap().get_auth_cookie().ok_or("Auth cookie not found")?;
     let client = reqwest::Client::builder()
         .cookie_store(true)
         .cookie_provider(cookie_jar)
@@ -279,7 +242,6 @@ async fn make_request(params: RequestParams, state: tauri::State<'_, Mutex<AppSt
 
     let response = request_builder
         .header("User-Agent", "Spectre/1.0")
-        .header("Cookie", auth_cookie)
         .send()
         .await;
 
@@ -302,9 +264,7 @@ async fn make_request(params: RequestParams, state: tauri::State<'_, Mutex<AppSt
 async fn is_logged_in(state: tauri::State<'_, Mutex<AppState>>) -> Result<bool, String> {
     let url = Url::parse("https://api.vrchat.cloud").unwrap();
     let cookie_jar = state.lock().unwrap().cookie_jar.clone();
-    let cookies = cookie_jar.cookies(&url)
-        .and_then(|cookies| cookies.to_str().ok().map(|s| s.to_string()))
-        .unwrap_or_default();
+    let cookies = cookie_jar.cookies(&url).unwrap_or_else(|| "".to_string().parse().unwrap());
 
     Ok(!cookies.is_empty())
 }
@@ -318,8 +278,24 @@ async fn get_cookies(state: State<'_, Mutex<AppState>>) -> Result<String, String
     let mut contents = String::new();
     file.read_to_string(&mut contents).map_err(|e| format!("Failed to read cookies file: {}", e))?;
 
-    let cookies: serde_json::Value = serde_json::from_str(&contents).map_err(|e| format!("Failed to parse cookies JSON: {}", e))?;
-    Ok(cookies.to_string())
+    // Function to strip the prefix and cut at the semicolon
+    fn strip_and_cut_prefix(contents: &str, prefix: &str) -> Option<String> {
+        if let Some(stripped) = contents.strip_prefix(prefix) {
+            Some(stripped.split(';').next().unwrap_or("").to_string())
+        } else {
+            None
+        }
+    }
+
+    // Try to strip "twoFactorAuth=" or "auth=" from the cookie string
+    if let Some(stripped) = strip_and_cut_prefix(&contents, "twoFactorAuth=") {
+        Ok(stripped)
+    } else if let Some(stripped) = strip_and_cut_prefix(&contents, "auth=") {
+        Ok(stripped)
+    } else {
+        // If no prefix found, cut at the first semicolon if it exists
+        Ok(contents.split(';').next().unwrap_or("").to_string())
+    }
 }
 
 fn main() {
