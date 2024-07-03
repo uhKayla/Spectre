@@ -7,16 +7,15 @@
     main {
         display: flex;
         justify-content: center;
-        align-items: center;
-        height: 100vh;
     }
 </style>
 
-<main class="">
-	<Card.Root class="w-[700px] p-4">
-		<Card.Content>
-			<Me />
-		</Card.Content>
-	</Card.Root>
+<main class="pt-4">
+	<Me />
+<!--	<Card.Root class="w-[700px] p-4">-->
+<!--		<Card.Content>-->
+<!--			-->
+<!--		</Card.Content>-->
+<!--	</Card.Root>-->
 
 </main>

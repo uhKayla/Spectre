@@ -58,7 +58,7 @@
 		<div class="loading">Loading...</div>
 	{:else}
 		{#if avatarData}
-			<ScrollArea class="h-[300px]">
+			<ScrollArea class="h-[500px] border rounded-lg p-2">
 				<Card.Root class="card">
 					<Card.Header>
 						<img src="{avatarData.imageUrl}" alt="{avatarData.name}" class="h-[240px] object-cover" />
