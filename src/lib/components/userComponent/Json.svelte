@@ -9,6 +9,6 @@
 }
 </script>
 
-<ScrollArea class="h-100 rounded-md border p-4" orientation="both">
+<ScrollArea class="h-64 rounded-md border p-4" orientation="both">
 	<pre class="text-sm" style="white-space: pre-line">{formatUserData(currentUser)}</pre>
 </ScrollArea>
