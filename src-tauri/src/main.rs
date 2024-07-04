@@ -309,6 +309,7 @@ fn main() {
     tauri::Builder::default()
         .manage(state)
         .invoke_handler(tauri::generate_handler![login, verify_two_factor, logout, get_request, make_request, is_logged_in, get_cookies])
+        .plugin(tauri_plugin_store::Builder::default().build())
         .run(context)
         .expect("error while running tauri application");
 }

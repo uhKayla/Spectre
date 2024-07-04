@@ -112,30 +112,6 @@
 	}
 </script>
 
-<div class="grid gap-8 mt-5">
-	<div class="flex items-center gap-4">
-		<Avatar.Root class="hidden h-9 w-9 sm:flex">
-			<Avatar.Image src={currentUser?.userIcon || currentUser?.currentAvatarImageUrl} alt="Avatar" />
-			<Avatar.Fallback>{currentUser?.displayName?.charAt(0).toUpperCase() || 'NA'}</Avatar.Fallback>
-		</Avatar.Root>
-		<div class="grid gap-1">
-			<p class="text-sm font-medium leading-none">
-				{currentUser?.displayName || 'Username'}
-			</p>
-			<p class="text-sm text-muted-foreground">{currentUser?.statusDescription || currentUser?.status}</p>
-		</div>
-		<Button class="ml-auto font-medium">View Website</Button>
-	</div>
-	<p>
-		{#each getFilteredTags(currentUser?.tags) as tag}
-			{#if tagToBadgeMap[tag]}
-				<Badge variant="outline" style="border-color: {tagToColorMap[tag]}; color: white;">
-					{tagToBadgeMap[tag]}
-				</Badge>
-			{/if}
-		{/each}
-	</p>
-	<Separator />
 	<Tabs.Root value="bio" class="w-[620px]">
 		<Tabs.List class="grid w-full grid-cols-4">
 			<Tabs.Trigger value="bio">Bio</Tabs.Trigger>
@@ -144,7 +120,36 @@
 			<Tabs.Trigger value="json">JSON</Tabs.Trigger>
 		</Tabs.List>
 		<Tabs.Content value="bio">
-			<Bio currentUser="{currentUser}"/>
+			<div class="grid gap-8 mt-5">
+				<div class="">
+					<div class="flex items-center gap-4">
+						<Avatar.Root class="hidden h-9 w-9 sm:flex">
+							<Avatar.Image src={currentUser?.userIcon || currentUser?.currentAvatarImageUrl} alt="Avatar" />
+							<Avatar.Fallback>{currentUser?.displayName?.charAt(0).toUpperCase() || 'NA'}</Avatar.Fallback>
+						</Avatar.Root>
+						<div class="grid gap-1">
+							<p class="text-sm font-medium leading-none">
+								{currentUser?.displayName || 'Username'}
+							</p>
+							<p class="text-sm text-muted-foreground">{currentUser?.statusDescription || currentUser?.status}</p>
+						</div>
+						<Button class="ml-auto font-medium">View Website</Button>
+					</div>
+					<p class="pt-2">
+						{#each getFilteredTags(currentUser?.tags) as tag}
+							{#if tagToBadgeMap[tag]}
+								<Badge variant="outline" style="border-color: {tagToColorMap[tag]}; color: white;">
+									{tagToBadgeMap[tag]}
+								</Badge>
+							{/if}
+						{/each}
+					</p>
+				</div>
+				<Separator />
+			</div>
+			<div class="pt-4">
+				<Bio currentUser="{currentUser}"/>
+			</div>
 		</Tabs.Content>
 		<Tabs.Content value="avatar">
 			{#if currentUser !== null}
@@ -157,4 +162,3 @@
 			<Json currentUser="{currentUser}"/>
 		</Tabs.Content>
 	</Tabs.Root>
-</div>
