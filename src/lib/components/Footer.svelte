@@ -121,7 +121,7 @@
 		<div class="font-mono ticker-wrapper">
 			<div class="hwrap">
 				<div class="hmove">
-					<div class="hitem" on:click={openAw}>Made with ❤️ by ANGELWARE</div>
+					<a class="hitem" on:click={openAw} href="/">Made with ❤️ by ANGELWARE</a>
 					<div class="hitem">Online Friends: {onlineFriendsCount}</div>
 					<div class="hitem">Online Users: {onlineUsers}</div>
 					<div class="hitem">VRChat Time: {currentTime}</div>
