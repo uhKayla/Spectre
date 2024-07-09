@@ -7,6 +7,7 @@
 	import { getApiTime } from '$lib/utils/getApiTime';
 	import { getOnlineUsers } from '$lib/utils/getOnlineUsers';
 	import { open } from '@tauri-apps/api/shell';
+	import { reloadData } from '$lib/functions/loadData';
 
 	let onlineFriendsCount = 0;
 	let onlineUsers = 0;
@@ -47,6 +48,7 @@
 
 	onMount(async () => {
 		try {
+			await reloadData(false);
 			onlineFriendsCount = await getOnlineUsers();
 			onlineUsers = await getUsersOnline();
 			dateTime = await getApiTime();
