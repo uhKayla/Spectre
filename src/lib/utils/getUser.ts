@@ -14,7 +14,7 @@ export const loadUser = async (userId: string): Promise<ExternalUserData> => {
 				body: null
 			}
 		});
-		console.log(response);
+		// console.log(response);
 		return JSON.parse(response);
 	} catch (error) {
 		console.error('Error user:', error);

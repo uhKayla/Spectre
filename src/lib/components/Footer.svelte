@@ -7,17 +7,15 @@
 	import { getApiTime } from '$lib/utils/getApiTime';
 	import { getOnlineUsers } from '$lib/utils/getOnlineUsers';
 	import { open } from '@tauri-apps/api/shell';
+	import { reloadData } from '$lib/functions/loadData';
+	import { get } from 'svelte/store';
+	import { checkUserStatus } from '$lib/functions/checkUserStatus';
 
 	let onlineFriendsCount = 0;
 	let onlineUsers = 0;
 	let dateTime: string = '';
 	let currentTime: string = 'Loading...';
-
-	// user.subscribe((userData: UserData | null) => {
-	// 	if (userData) {
-	// 		onlineFriendsCount = userData.onlineFriends.length;
-	// 	}
-	// });
+	let currentlyOnline: boolean = false;
 
 	function cleanDateTimeString(dateTime: string): string {
 		// Remove any extraneous quotes and trim the string
@@ -47,6 +45,8 @@
 
 	onMount(async () => {
 		try {
+			await reloadData(false);
+			currentlyOnline = await checkUserStatus();
 			onlineFriendsCount = await getOnlineUsers();
 			onlineUsers = await getUsersOnline();
 			dateTime = await getApiTime();
@@ -59,9 +59,19 @@
 			console.error('Error on mount:', error);
 		}
 	});
+
+	$: tickerClass = currentlyOnline ? 'bg-green' : 'bg-background';
 </script>
 
 <style>
+    :root {
+        --ticker-bg-color: hsl(var(--background));
+    }
+
+    .ticker-container.bg-green {
+        --ticker-bg-color: green;
+    }
+
     .ticker-container {
         width: 100%;
         display: flex;
@@ -87,41 +97,52 @@
 
     .ticker-wrapper::before {
         left: 0;
-        background: linear-gradient(to right, hsl(var(--background)), transparent);
+        background: linear-gradient(to right, var(--ticker-bg-color), transparent);
         z-index: 1;
     }
 
     .ticker-wrapper::after {
         right: 0;
-        background: linear-gradient(to left, hsl(var(--background)), transparent);
+        background: linear-gradient(to left, var(--ticker-bg-color), transparent);
     }
 
-		/* ticker https://code-boxx.com/html-css-news-ticker-horizontal-vertical/*/
+    /* ticker https://code-boxx.com/html-css-news-ticker-horizontal-vertical/*/
     .hmove {
-				display: flex;
+        display: flex;
         justify-content: space-between;
-		}
-    .hitem { width: 100%; flex-shrink: 0; }
+    }
+    .hitem {
+        width: 100%;
+        flex-shrink: 0;
+    }
     .hwrap {
-				overflow: hidden;
-				justify-content: space-between;
-		}
+        overflow: hidden;
+        justify-content: space-between;
+    }
 
     @keyframes tickerh {
-        0% { transform: translatex(100%); }
-        100% { transform: translatex(-400%); }
+        0% {
+            transform: translatex(100%);
+        }
+        100% {
+            transform: translatex(-400%);
+        }
     }
-    .hmove { animation: tickerh linear 20s infinite; }
-    .hmove:hover { animation-play-state: paused; }
-		/* end ticker */
+    .hmove {
+        animation: tickerh linear 20s infinite;
+    }
+    .hmove:hover {
+        animation-play-state: paused;
+    }
+    /* end ticker */
 </style>
 
 <footer class="h-10 flex justify-center items-center w-screen bg-background border-t">
-	<div class="ticker-container">
+	<div class="ticker-container {tickerClass}">
 		<div class="font-mono ticker-wrapper">
 			<div class="hwrap">
 				<div class="hmove">
-					<div class="hitem" on:click={openAw}>Made with ❤️ by ANGELWARE</div>
+					<a class="hitem" on:click={openAw} href="/">Made with ❤️ by ANGELWARE</a>
 					<div class="hitem">Online Friends: {onlineFriendsCount}</div>
 					<div class="hitem">Online Users: {onlineUsers}</div>
 					<div class="hitem">VRChat Time: {currentTime}</div>

@@ -10,7 +10,7 @@ export const loadFriendsList = async (): Promise<Friend[]> => {
 				body: null
 			}
 		});
-		console.log('Response:', response);
+		// console.log('Response:', response);
 		return JSON.parse(response) as Friend[];
 	} catch (error) {
 		console.error('Error fetching friends:', error);
