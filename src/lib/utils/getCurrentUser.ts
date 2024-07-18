@@ -11,6 +11,7 @@ export const getCurrentUser = async (): Promise<UserData> => {
 			}
 		});
 		const user: UserData = JSON.parse(response);
+		console.log(user);
 		return user;
 	} catch (error) {
 		console.error(`Error fetching user data:`, error);
